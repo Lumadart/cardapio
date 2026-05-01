@@ -1,0 +1,16 @@
+{
+  "name": "Cardápio Inteligente para Edvirges",
+  "short_name": "Cardápio Edvirges",
+  "description": "Meu sistema personalizado de refeições",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2a2f38",
+  "theme_color": "#2a2f38",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

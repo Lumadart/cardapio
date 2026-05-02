@@ -1,9 +1,9 @@
-const CACHE_NAME = 'cardapio-v1.1'; // Atualize aqui sempre que mudar o código
+const CACHE_NAME = 'cardapio-v1.2'; // Atualizado para v1.2 para forçar o celular a baixar o novo código
 const assets = [
   './',
   './index.html',
-  './styles.css?v=1.1',
-  './app.js?v=1.1',
+  './styles.css?v=1.1', // Certifique-se de que no index.html também esteja v=1.1
+  './app.js?v=1.1',     // Certifique-se de que no index.html também esteja v=1.1
   './manifest.json',
   './icon.png',
   'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap',
@@ -14,7 +14,7 @@ const assets = [
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('PWA: Instalando novo cache');
+      console.log('PWA: Instalando novo cache ' + CACHE_NAME);
       return cache.addAll(assets);
     })
   );
@@ -35,6 +35,8 @@ self.addEventListener('activate', e => {
       );
     })
   );
+  // Garante que o novo Service Worker controle todas as abas abertas imediatamente
+  self.clients.claim();
 });
 
 // Estratégia de Fetch: Tenta o Cache, se não tiver, busca na Rede

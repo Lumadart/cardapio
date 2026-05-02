@@ -216,12 +216,10 @@ html {
     color: var(--text-muted);
 }
 
-/* 🟢 NOVO: Estilo para itens com receita (Link verde e sublinhado) */
+/* 🟢 Estilo para itens com receita */
 .has-recipe {
     color: var(--teal-primary) !important;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+    text-decoration: none;
     cursor: pointer;
 }
 

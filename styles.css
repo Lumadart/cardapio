@@ -380,6 +380,27 @@ html {
     white-space: pre-wrap;
 }
 
+.modal-footer {
+    margin-top: var(--space-xl);
+    padding-bottom: var(--space-sm);
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: var(--space-lg);
+    border-radius: var(--radius);
+    border: none;
+    background: var(--teal-primary);
+    color: var(--bg-main);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-md);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.btn-confirm:active {
+    opacity: 0.8;
+}
 /* ─────────────────────────────
     🧭 Navigation
    ───────────────────────────── */

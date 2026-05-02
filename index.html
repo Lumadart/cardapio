@@ -64,22 +64,44 @@
     <main id="app"></main>
 
     <!-- ─────────────────────────────
+      🍳 SECTION: MODAL DE RECEITA
+    ───────────────────────────── -->
+    <div id="recipe-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content anim-up" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modal-title">Nome da Receita</h2>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body" id="modal-body">
+                <!-- Conteúdo preenchido dinamicamente pelo JS -->
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-confirm" onclick="closeModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─────────────────────────────
       🧭 SECTION: Navigation
     ───────────────────────────── -->
     <nav class="bottom-nav">
         <button data-route="semana" class="active">
-            <i class="fa-solid fa-calendar-days"></i>
+            <i class="fa-solid fa-calendar-week"></i>
             <span>Semana</span>
         </button>
 
         <button data-route="refeicoes">
             <i class="fa-solid fa-utensils"></i>
-            <span>Sugestões</span>
+            <span>Refeições</span>
         </button>
 
         <button data-route="itens">
-            <i class="fa-solid fa-list-ul"></i>
-            <span>Alimentos</span>
+            <i class="fa-solid fa-list"></i>
+            <span>Itens</span>
         </button>
     </nav>
 
@@ -91,6 +113,11 @@
                     .then(reg => console.log("PWA: Service Worker registrado com sucesso!"))
                     .catch(err => console.log("Erro ao registrar SW:", err));
             });
+        }
+
+        // Função básica para fechar o modal (será usada pelo app.js)
+        function closeModal(event) {
+            document.getElementById('recipe-modal').classList.remove('active');
         }
     </script>
 </body>

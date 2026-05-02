@@ -46,6 +46,9 @@
     --sexta-dark: #2a4f6f;
     --sabado: #a66cd9;
     --sabado-dark: #4a2a6f;
+
+    /* Overlay para o modal */
+    --modal-overlay: rgba(0, 0, 0, 0.85);
 }
 
 /* ─────────────────────────────
@@ -82,7 +85,7 @@ html {
 
 #app {
     padding: var(--space-xl);
-    padding-top: var(--space-xl); /* Espaçamento superior ajustado sem header */
+    padding-top: var(--space-xl);
     padding-bottom: calc(var(--nav-height) + var(--space-xl));
     display: flex;
     flex-direction: column;
@@ -93,7 +96,6 @@ html {
     #app { max-width: var(--container-max-width); margin: 0 auto; }
 }
 
-/* Exibição da Data (Aba Semanal) */
 .date-display {
     display: flex;
     justify-content: space-between;
@@ -147,10 +149,9 @@ html {
     color: var(--bg-main);
 }
 
-/* Cor para o dia de HOJE quando não estiver selecionado */
 .day-btn.is-today:not(.active) {
     background-color: var(--teal-dark);
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Opcional: uma bordinha sutil */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ─────────────────────────────
@@ -173,7 +174,6 @@ html {
     gap: var(--space-sm);
 }
 
-/* Cards Genéricos (Sugestões e Alimentos) */
 .card:not(.domingo):not(.segunda):not(.terca):not(.quarta):not(.quinta):not(.sexta):not(.sabado) .card-header {
     background: var(--teal-primary);
     color: var(--teal-dark);
@@ -214,6 +214,131 @@ html {
     border-radius: var(--radius-sm);
     font-size: var(--font-xs);
     color: var(--text-muted);
+}
+
+/* 🟢 NOVO: Estilo para itens com receita (Link verde e sublinhado) */
+.has-recipe {
+    color: var(--teal-primary) !important;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    cursor: pointer;
+}
+
+.recipe-icon {
+    font-size: 0.7rem;
+    margin-left: var(--space-xxs);
+    opacity: 0.7;
+}
+
+/* ─────────────────────────────
+    🍳 SECTION: Modal de Receitas
+   ───────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-overlay);
+    display: none;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: var(--container-max-width);
+    border-radius: 24px 24px 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: var(--space-xl);
+    border: var(--border-width) solid var(--divider);
+    border-bottom: none;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+#modal-title {
+    font-size: 1.3rem;
+    color: var(--teal-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.close-btn {
+    background: var(--gray-5);
+    border: none;
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.recipe-time {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: rgba(20, 184, 166, 0.1);
+    color: var(--teal-primary);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-lg);
+    width: fit-content;
+}
+
+.recipe-section-title {
+    font-size: var(--font-md);
+    font-weight: var(--font-weight-semibold);
+    margin: var(--space-xl) 0 var(--space-sm) 0;
+    color: var(--text-primary);
+    border-left: 3px solid var(--teal-primary);
+    padding-left: var(--space-sm);
+}
+
+.recipe-prep-text {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    line-height: 1.6;
+    background: var(--gray-5);
+    padding: var(--space-lg);
+    border-radius: var(--radius);
+    white-space: pre-wrap;
+}
+
+.modal-footer {
+    margin-top: var(--space-xl);
+    padding-bottom: var(--space-sm);
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: var(--space-lg);
+    border-radius: var(--radius);
+    border: none;
+    background: var(--teal-primary);
+    color: var(--bg-main);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-md);
+    cursor: pointer;
 }
 
 /* ─────────────────────────────

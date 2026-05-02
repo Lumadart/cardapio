@@ -7,6 +7,7 @@ const SHEET_ID = '1FgvbAHH5qQHVCP1ySo5Dss_oOdkXYXOn4uRqzwvkUyQ';
 let items = {};
 let baseMeals = [];
 let weekMeals = {};
+let recipes = {}; // Armazenará as receitas agrupadas
 
 const categoryIcons = {
     "Proteínas": '<i class="fa-solid fa-drumstick-bite"></i>',
@@ -46,10 +47,11 @@ async function initApp() {
     app.innerHTML = "<div style='text-align:center; padding:50px; opacity:0.5'>Carregando cardápio...</div>";
 
     try {
-        const [rowsConfig, rowsAlimentos, rowsAgenda] = await Promise.all([
+        const [rowsConfig, rowsAlimentos, rowsAgenda, rowsReceitas] = await Promise.all([
             fetchSheetData('Configuracoes'),
             fetchSheetData('Alimentos'),
-            fetchSheetData('Agenda')
+            fetchSheetData('Agenda'),
+            fetchSheetData('Receitas') // Nova aba carregada
         ]);
 
         baseMeals = rowsConfig.slice(1).map(r => {
@@ -69,6 +71,26 @@ async function initApp() {
                 qty: (r.c[2] && r.c[2].v) ? r.c[2].v : '---',
                 category: r.c[3] ? r.c[3].v : "Geral"
             };
+        });
+
+        // Agrupamento de Receitas
+        recipes = {};
+        rowsReceitas.slice(1).forEach(r => {
+            if (!r.c || !r.c[0]) return;
+            const nomeReceita = String(r.c[0].v).trim();
+            
+            if (!recipes[nomeReceita]) {
+                recipes[nomeReceita] = {
+                    ingredients: [],
+                    prep: r.c[3] ? r.c[3].v : "",
+                    time: r.c[4] ? r.c[4].v : "" // Coluna E: Tempo de Preparo
+                };
+            }
+            
+            recipes[nomeReceita].ingredients.push({
+                name: r.c[1] ? r.c[1].v : "",
+                qty: r.c[2] ? r.c[2].v : ""
+            });
         });
 
         weekMeals = { domingo: [], segunda: [], terca: [], quarta: [], quinta: [], sexta: [], sabado: [] };
@@ -115,6 +137,33 @@ function normalize(dayMeals) {
     });
 }
 
+// 🍳 Funções do Modal
+function openRecipe(nome) {
+    const recipe = recipes[nome];
+    if (!recipe) return;
+
+    document.getElementById('modal-title').innerText = nome;
+    const body = document.getElementById('modal-body');
+    
+    let html = "";
+    if (recipe.time) {
+        html += `<div class="recipe-time"><i class="fa-regular fa-clock"></i> ${recipe.time}</div>`;
+    }
+
+    html += `<div class="recipe-section-title"><i class="fa-solid fa-basket-shopping"></i> Ingredientes</div>`;
+    recipe.ingredients.forEach(ing => {
+        html += `<div class="row"><span><i class="fa-solid fa-check"></i> ${ing.name}</span><span>${ing.qty}</span></div>`;
+    });
+
+    if (recipe.prep) {
+        html += `<div class="recipe-section-title"><i class="fa-solid fa-fire-burner"></i> Modo de Preparo</div>`;
+        html += `<div class="recipe-prep-text">${recipe.prep}</div>`;
+    }
+
+    body.innerHTML = html;
+    document.getElementById('recipe-modal').classList.add('active');
+}
+
 // ─────────────────────────────
 // 🍽️ SECTION: RENDERS
 // ─────────────────────────────
@@ -137,7 +186,6 @@ function renderSemana(app) {
 
     days.forEach(day => {
         const btn = document.createElement("button");
-        // LÓGICA: Adiciona 'active' se for o selecionado, e 'is-today' se for o dia real de hoje
         const isActive = (day === today);
         btn.className = `day-btn ${isActive ? 'active' : ''} ${day === today ? 'is-today' : ''}`;
         
@@ -181,7 +229,14 @@ function renderDayCards(container, day, meals) {
             ? meal.foods.map(id => {
                 const data = getItemData(id);
                 const icon = categoryIcons[data.category] || categoryIcons["Geral"];
-                return `<div class="row"><span>${icon} ${data.name}</span><span>${data.qty}</span></div>`;
+                const hasRecipe = recipes[data.name] ? 'has-recipe' : '';
+                const clickAttr = recipes[data.name] ? `onclick="openRecipe('${data.name}')"` : '';
+                const recipeIcon = recipes[data.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+                
+                return `<div class="row">
+                            <span class="${hasRecipe}" ${clickAttr}>${icon} ${data.name}${recipeIcon}</span>
+                            <span>${data.qty}</span>
+                        </div>`;
             }).join("")
             : `<div class="row" style="opacity:0.3"><span>${EMPTY_ICON} Nada planejado</span><span></span></div>`;
 
@@ -218,7 +273,14 @@ function renderRefeicoes(app) {
             ? Array.from(allowedIds).map(id => {
                 const i = getItemData(id);
                 const icon = categoryIcons[i.category] || categoryIcons["Geral"];
-                return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
+                const hasRecipe = recipes[i.name] ? 'has-recipe' : '';
+                const clickAttr = recipes[i.name] ? `onclick="openRecipe('${i.name}')"` : '';
+                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+
+                return `<div class="row">
+                            <span class="${hasRecipe}" ${clickAttr}>${icon} ${i.name}${recipeIcon}</span>
+                            <span>${i.qty}</span>
+                        </div>`;
             }).join("")
             : `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`;
 
@@ -250,7 +312,14 @@ function renderItens(app) {
             .sort((a,b) => a.name.localeCompare(b.name))
             .map(i => {
                 const icon = categoryIcons[i.category] || categoryIcons["Geral"];
-                return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
+                const hasRecipe = recipes[i.name] ? 'has-recipe' : '';
+                const clickAttr = recipes[i.name] ? `onclick="openRecipe('${i.name}')"` : '';
+                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+
+                return `<div class="row">
+                            <span class="${hasRecipe}" ${clickAttr}>${icon} ${i.name}${recipeIcon}</span>
+                            <span>${i.qty}</span>
+                        </div>`;
             }).join("");
 
         card.innerHTML = `

@@ -1,17 +1,47 @@
-const CACHE_NAME = 'cardapio-v1';
+const CACHE_NAME = 'cardapio-v1.1'; // Atualize aqui sempre que mudar o código
 const assets = [
   './',
   './index.html',
-  './styles.css',
-  './app.js',
+  './styles.css?v=1.1',
+  './app.js?v=1.1',
+  './manifest.json',
+  './icon.png',
   'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
 ];
 
+// Instalação: Salva os arquivos no cache
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('PWA: Instalando novo cache');
+      return cache.addAll(assets);
+    })
+  );
+  self.skipWaiting(); // Força o novo SW a assumir o controle imediatamente
 });
 
+// Ativação: Remove caches antigos
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            console.log('PWA: Removendo cache antigo:', cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Estratégia de Fetch: Tenta o Cache, se não tiver, busca na Rede
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+  e.respondWith(
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request);
+    })
+  );
 });

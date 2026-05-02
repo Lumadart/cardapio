@@ -21,12 +21,12 @@ const categoryIcons = {
 };
 
 const mealIcons = {
-    "Café da Manhã": '<i class="fa-solid fa-mug-hot"></i>',
+    "Desjejum": '<i class="fa-solid fa-stroopwafel"></i>',
+    "Café": '<i class="fa-solid fa-mug-hot"></i>',
     "Almoço": '<i class="fa-solid fa-utensils"></i>',
     "Lanche": '<i class="fa-solid fa-apple-whole"></i>',
     "Jantar": '<i class="fa-solid fa-bowl-food"></i>',
-    "Ceia": '<i class="fa-solid fa-moon"></i>',
-    "Geral": '<i class="fa-solid fa-utensils"></i>'
+    "Geral": '<i class="fa-solid fa-plate-wheat"></i>'
 };
 
 // ─────────────────────────────

@@ -90,7 +90,8 @@ async function initApp() {
             }
         });
 
-        navigate("hoje");
+        // Agora inicia sempre pela aba Semana
+        navigate("semana");
     } catch (error) {
         console.error("Erro:", error);
         app.innerHTML = `<div style="text-align:center; padding:50px; color:var(--segunda)">Erro ao carregar dados.</div>`;
@@ -119,32 +120,22 @@ function normalize(dayMeals) {
 // 🍽️ SECTION: RENDERS
 // ─────────────────────────────
 
-function renderHoje(app) {
-    const day = getToday();
-    const meals = normalize(weekMeals[day]);
-    const dateStr = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
-    
-    app.innerHTML = `
-        <div class="date-display">
-            <span class="day-label">${dayLabels[day]}</span>
-            <span class="date-label">${dateStr}</span>
-        </div>
-    `;
-
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.gap = "var(--block-margin)";
-    app.appendChild(container);
-
-    renderDayCards(container, day, meals);
-}
-
 function renderSemana(app) {
+    const today = getToday();
+    const dateStr = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+
+    // Novo cabeçalho de data dinâmico dentro do app
+    const dateHeader = document.createElement("div");
+    dateHeader.className = "date-display";
+    dateHeader.innerHTML = `
+        <span class="day-label" id="current-day-name">${dayLabels[today]}</span>
+        <span class="date-label">${dateStr}</span>
+    `;
+    app.appendChild(dateHeader);
+
     const selector = document.createElement("div");
     selector.className = "day-selector";
     const shortDays = { domingo: "D", segunda: "S", terca: "T", quarta: "Q", quinta: "Q", sexta: "S", sabado: "S" };
-    const today = getToday();
 
     days.forEach(day => {
         const btn = document.createElement("button");
@@ -153,12 +144,14 @@ function renderSemana(app) {
         btn.onclick = () => {
             document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
+            document.getElementById("current-day-name").innerText = dayLabels[day];
             filterWeekDay(day);
         };
         selector.appendChild(btn);
     });
 
     app.appendChild(selector);
+
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "week-cards-container";
     cardsContainer.style.display = "flex";
@@ -250,28 +243,23 @@ function renderItens(app) {
 // 🔄 SECTION: ROUTER
 // ─────────────────────────────
 
-const routes = { hoje: renderHoje, semana: renderSemana, refeicoes: renderRefeicoes, itens: renderItens };
+// Removida a rota 'hoje'
+const routes = { semana: renderSemana, refeicoes: renderRefeicoes, itens: renderItens };
 
 function navigate(route) {
     const app = document.querySelector("#app");
-    const headerSpan = document.querySelector(".app-header span");
     
-    // Títulos dinâmicos por página
-    const pageTitles = {
-        hoje: '<i class="fa-solid fa-calendar-day"></i> Cardápio para hoje',
-        semana: '<i class="fa-solid fa-calendar-days"></i> Cardápio semanal',
-        refeicoes: '<i class="fa-solid fa-utensils"></i> Sugestões de refeições',
-        itens: '<i class="fa-solid fa-list-ul"></i> Lista de alimentos'
-    };
-
-    if (headerSpan) headerSpan.innerHTML = pageTitles[route];
-    
+    // Limpa o conteúdo atual
     app.innerHTML = "";
+    
+    // Executa a função de renderização da rota
     if (routes[route]) routes[route](app);
 
+    // Atualiza o estado visual dos botões do menu inferior
     document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
     const targetBtn = document.querySelector(`[data-route="${route}"]`);
     if (targetBtn) targetBtn.classList.add("active");
+    
     window.scrollTo(0, 0);
 }
 
@@ -279,4 +267,5 @@ document.querySelectorAll(".bottom-nav button").forEach(b => {
     b.addEventListener("click", () => navigate(b.dataset.route));
 });
 
+// Inicialização oficial
 document.addEventListener("DOMContentLoaded", initApp);

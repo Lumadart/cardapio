@@ -60,51 +60,39 @@
 
 <body>
 
-  <!-- ─────────────────────────────
-    🍽️ SECTION: Header
-  ───────────────────────────── -->
-  <header class="app-header">
-    <span>
-      Cardápio Inteligente<br>para Edvirges
-    </span>
-  </header>
+    <!-- Onde o JavaScript renderiza os cards -->
+    <main id="app"></main>
 
-  <!-- Onde o JavaScript renderiza os cards -->
-  <main id="app"></main>
+    <!-- ─────────────────────────────
+      🧭 SECTION: Navigation
+    ───────────────────────────── -->
+    <nav class="bottom-nav">
+        <button data-route="semana" class="active">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Semana</span>
+        </button>
 
-  <!-- ─────────────────────────────
-    🧭 SECTION: Navigation
-  ───────────────────────────── -->
-  <nav class="bottom-nav">
-    <button data-route="hoje" class="active">
-      <i class="fa-solid fa-calendar-day"></i>
-      <span>Hoje</span>
-    </button>
+        <button data-route="refeicoes">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Sugestões</span>
+        </button>
 
-    <button data-route="semana">
-      <i class="fa-solid fa-calendar-days"></i>
-      <span>Semana</span>
-    </button>
+        <button data-route="itens">
+            <i class="fa-solid fa-list-ul"></i>
+            <span>Alimentos</span>
+        </button>
+    </nav>
 
-    <button data-route="refeicoes">
-      <i class="fa-solid fa-utensils"></i>
-      <span>Sugestões</span>
-    </button>
-
-    <button data-route="itens">
-      <i class="fa-solid fa-list-ul"></i>
-      <span>Alimentos</span>
-    </button>
-  </nav>
-
-  <!-- Scripts -->
-  <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("PWA: Service Worker registrado com sucesso!"));
-    }
-  </script>
+    <!-- Registro do Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log("PWA: Service Worker registrado com sucesso!"))
+                    .catch(err => console.log("Erro ao registrar SW:", err));
+            });
+        }
+    </script>
 </body>
 
 </html>

@@ -24,7 +24,6 @@
 
     --bg-main: #0f1115;
     --bg-card: #1a1d23;
-    --bg-header: #2a2f38;
     --text-primary: #e6e6e6;
     --text-muted: #a0a6b1;
     --divider: #2a2f38;
@@ -74,7 +73,7 @@ html {
 }
 
 /* ─────────────────────────────
-    🍽️ SECTION: Layout & Header
+    🍽️ SECTION: Layout
    ───────────────────────────── */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(10px); }
@@ -83,6 +82,7 @@ html {
 
 #app {
     padding: var(--space-xl);
+    padding-top: var(--space-xl); /* Espaçamento superior ajustado sem header */
     padding-bottom: calc(var(--nav-height) + var(--space-xl));
     display: flex;
     flex-direction: column;
@@ -93,44 +93,26 @@ html {
     #app { max-width: var(--container-max-width); margin: 0 auto; }
 }
 
-.app-header {
-    background: var(--bg-header);
-    padding: var(--space-xl);
-    text-align: center;
-    border-bottom: var(--border-width) solid var(--divider);
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.app-header span {
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.5px;
-    font-size: var(--font-md);
-    color: var(--teal-primary);
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-/* Exibição da Data (Hoje) */
+/* Exibição da Data (Aba Semanal) */
 .date-display {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
+    align-items: baseline;
+    margin-bottom: var(--space-sm);
     padding: 0 var(--space-xxs);
+    animation: fadeInUp 0.4s ease-out;
 }
 
 .day-label {
     font-weight: var(--font-weight-semibold);
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    color: var(--text-primary);
 }
 
 .date-label {
     font-size: var(--font-sm);
     color: var(--teal-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
 /* ─────────────────────────────
@@ -185,7 +167,7 @@ html {
     gap: var(--space-sm);
 }
 
-/* Cards Genéricos: Fundo Teal Primary / Texto Teal Dark */
+/* Cards Genéricos (Sugestões e Alimentos) */
 .card:not(.domingo):not(.segunda):not(.terca):not(.quarta):not(.quinta):not(.sexta):not(.sabado) .card-header {
     background: var(--teal-primary);
     color: var(--teal-dark);
@@ -213,7 +195,6 @@ html {
     gap: var(--space-sm);
 }
 
-/* Ícones dos Alimentos em Cinza */
 .row i {
     color: var(--text-muted);
     font-size: 1rem;
@@ -274,7 +255,7 @@ html {
     background: var(--teal-primary);
 }
 
-/* 🎨 Dynamic Colors (Daily) */
+/* 🎨 Cores Diárias Dinâmicas */
 .domingo .card-header { background: var(--domingo); color: var(--domingo-dark); }
 .segunda .card-header { background: var(--segunda); color: var(--segunda-dark); }
 .terca .card-header   { background: var(--terca); color: var(--terca-dark); }

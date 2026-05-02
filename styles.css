@@ -1,14 +1,11 @@
 /* ─────────────────────────────
-   🍽️ SECTION: Design Tokens
+    🍽️ SECTION: Design Tokens
    ───────────────────────────── */
-
 :root {
     --font-family: "Montserrat", sans-serif;
-
     --font-xs: 12px;
     --font-sm: 14px;
     --font-md: 16px;
-
     --font-weight-semibold: 600;
 
     --space-xxs: 4px;
@@ -18,54 +15,46 @@
     --space-xl: 16px;
 
     --block-margin: var(--space-lg);
-
     --radius: 14px;
     --radius-sm: 8px;
-
     --border-width: 1px;
 
     --nav-height: 70px;
     --container-max-width: 600px;
 
+    /* Cores de Fundo e Texto */
     --bg-main: #0f1115;
     --bg-card: #1a1d23;
     --bg-header: #2a2f38;
+    --text-primary: #e6e6e6;
+    --text-muted: #a0a6b1;
+    --divider: #2a2f38;
 
-    --gray-3: #2a2f38;
-    --gray-4: #a0a6b1;
+    /* COR DE DESTAQUE (TEAL) */
+    --teal-primary: #14b8a6;
+    --teal-dark: #0f766e;
     --gray-5: #232730;
 
-    --text-primary: #e6e6e6;
-    --text-muted: var(--gray-4);
-
-    --divider: var(--gray-3);
-
+    /* Cores dos Dias (Mantidas apenas para os Cards) */
     --domingo: #d96c9d;
     --domingo-dark: #6f2a4a;
-
     --segunda: #d96c6c;
     --segunda-dark: #6f2a2a;
-
     --terca: #d9916c;
     --terca-dark: #6f452a;
-
     --quarta: #d9c46c;
     --quarta-dark: #6f5f2a;
-
     --quinta: #6cd98a;
     --quinta-dark: #2a6f45;
-
     --sexta: #6caed9;
     --sexta-dark: #2a4f6f;
-
     --sabado: #a66cd9;
     --sabado-dark: #4a2a6f;
 }
 
 /* ─────────────────────────────
-   🍽️ SECTION: Base & Scroll
+    🍽️ SECTION: Base & Scroll
    ───────────────────────────── */
-
 * {
     margin: 0;
     padding: 0;
@@ -81,47 +70,21 @@ body {
 html {
     scrollbar-gutter: stable;
     scroll-behavior: smooth;
-}
-
-html, body {
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     touch-action: manipulation;
 }
 
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-main);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--gray-3);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--gray-4);
-}
-
-/* Firefox */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--gray-3) var(--bg-main);
-}
-
 /* ─────────────────────────────
-   🍽️ SECTION: Layout
+    🍽️ SECTION: Layout & Header
    ───────────────────────────── */
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -144,7 +107,7 @@ html, body {
 }
 
 .app-header {
-    background: var(--bg-card);
+    background: var(--bg-header);
     padding: var(--space-xl);
     text-align: center;
     border-bottom: var(--border-width) solid var(--divider);
@@ -155,46 +118,53 @@ html, body {
     letter-spacing: 0.5px;
     text-transform: uppercase;
     font-size: var(--font-xs);
-    color: var(--gray-4);
+    color: var(--teal-primary);
+    /* Cor Teal no Título */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
 }
 
 .app-header i {
-    margin-right: var(--space-sm);
+    color: var(--teal-primary);
 }
 
 /* ─────────────────────────────
-   🎨 ESTILO DOS ÍCONES (VARIÁVEIS)
+    📅 SECTION: Submenu de Dias (Novo)
    ───────────────────────────── */
-
-/* Estilo para os ícones dentro das linhas (rows) */
-.row span i {
-    width: 20px;                     /* Largura fixa para manter o alinhamento do texto */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: var(--space-sm);   /* Usando seus 8px */
-    font-size: var(--font-md);       /* Usando seus 16px */
-    vertical-align: middle;
-    opacity: 0.8;                    /* Leve transparência para não "brigar" com o texto */
+.day-selector {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-xxs);
+    margin-bottom: var(--space-md);
+    background: var(--bg-card);
+    padding: var(--space-sm);
+    border-radius: var(--radius);
+    border: var(--border-width) solid var(--divider);
 }
 
-/* Estilo para os ícones nos cabeçalhos dos cards */
-.card-header i {
-    margin-right: var(--space-sm);   /* Espaçamento consistente */
-    font-size: var(--font-md);
-    vertical-align: middle;
+.day-btn {
+    flex: 1;
+    background: var(--gray-5);
+    border: none;
+    color: var(--text-muted);
+    padding: var(--space-sm) 0;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-/* Ajuste para ícones vazios/placeholder */
-.fa-circle-minus {
-    font-size: var(--font-xs);       /* Ícone de vazio um pouco menor (12px) */
-    opacity: 0.3 !important;
+.day-btn.active {
+    background: var(--teal-primary);
+    color: var(--bg-main);
 }
 
 /* ─────────────────────────────
-   🍽️ SECTION: Cards & Rows
+    🍽️ SECTION: Cards & Rows
    ───────────────────────────── */
-
 .card {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -207,7 +177,8 @@ html, body {
     padding: var(--space-lg);
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-md);
-    background: var(--bg-header);
+    background: var(--teal-primary);
+    color: var(--teal-dark);
 }
 
 .card-content {
@@ -228,18 +199,11 @@ html, body {
     font-size: var(--font-xs);
 }
 
-.card-content .row span:only-child {
-    background: transparent;
-    padding: 0;
-    font-size: var(--font-sm);
-}
-
 .meal-title {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-top: var(--space-lg);
-    margin-bottom: var(--space-lg);
+    margin: var(--space-lg) 0;
     font-weight: var(--font-weight-semibold);
 }
 
@@ -251,35 +215,8 @@ html, body {
 }
 
 /* ─────────────────────────────
-   📅 SECTION: Date Display (Diário)
+    🧭 SECTION: Navigation
    ───────────────────────────── */
-
-.date-display {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--block-margin);
-    padding: 0 var(--space-xxs);
-}
-
-.day-label {
-    font-size: var(--font-md);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    text-transform: capitalize;
-}
-
-.date-label {
-    font-size: var(--font-md);
-    color: var(--sexta);
-    font-weight: var(--font-weight-semibold);
-    text-transform: capitalize;
-}
-
-/* ─────────────────────────────
-   🧭 SECTION: Navigation
-   ───────────────────────────── */
-
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -288,6 +225,7 @@ html, body {
     background: var(--bg-card);
     display: flex;
     border-top: var(--border-width) solid var(--divider);
+    z-index: 100;
 }
 
 .bottom-nav button {
@@ -304,9 +242,9 @@ html, body {
 }
 
 .bottom-nav button i {
-    transition: transform 0.2s, color 0.2s;
     font-size: 1.2rem;
     margin-bottom: var(--space-xxs);
+    transition: 0.2s;
 }
 
 .bottom-nav button::before {
@@ -319,75 +257,80 @@ html, body {
     transition: 0.2s;
 }
 
-/* Active Navigation States */
-.bottom-nav button.active { color: #fff; }
-.bottom-nav button.active i { transform: translateY(-2px); transition: transform 0.3s ease; }
-.bottom-nav button:active i { transform: scale(0.9); }
+.bottom-nav button.active {
+    color: var(--teal-primary);
+}
 
-.bottom-nav button[data-route="hoje"].active { color: var(--quarta); }
-.bottom-nav button[data-route="hoje"].active::before { background: var(--quarta); }
+.bottom-nav button.active::before {
+    background: var(--teal-primary);
+}
 
-.bottom-nav button[data-route="semana"].active { color: var(--sexta); }
-.bottom-nav button[data-route="semana"].active::before { background: var(--sexta); }
-
-.bottom-nav button[data-route="refeicoes"].active { color: var(--quinta); }
-.bottom-nav button[data-route="refeicoes"].active::before { background: var(--quinta); }
-
-.bottom-nav button[data-route="itens"].active { color: var(--segunda); }
-.bottom-nav button[data-route="itens"].active::before { background: var(--segunda); }
+.bottom-nav button.active i {
+    transform: translateY(-2px);
+}
 
 /* ─────────────────────────────
-   🎨 SECTION: Dynamic Colors & States
+    🎨 Dynamic Colors (Somente para os Cards)
    ───────────────────────────── */
-
-/* Cards Por Dia */
-.domingo .card-header { background: var(--domingo); color: var(--domingo-dark); }
-.segunda .card-header { background: var(--segunda); color: var(--segunda-dark); }
-.terca .card-header { background: var(--terca); color: var(--terca-dark); }
-.quarta .card-header { background: var(--quarta); color: var(--quarta-dark); }
-.quinta .card-header { background: var(--quinta); color: var(--quinta-dark); }
-.sexta .card-header { background: var(--sexta); color: var(--sexta-dark); }
-.sabado .card-header { background: var(--sabado); color: var(--sabado-dark); }
-
-/* Meal Titles Dividers */
-.domingo .meal-title { color: var(--domingo); }
-.domingo .meal-title::after { background: var(--domingo-dark); }
-.segunda .meal-title { color: var(--segunda); }
-.segunda .meal-title::after { background: var(--segunda-dark); }
-.terca .meal-title { color: var(--terca); }
-.terca .meal-title::after { background: var(--terca-dark); }
-.quarta .meal-title { color: var(--quarta); }
-.quarta .meal-title::after { background: var(--quarta-dark); }
-.quinta .meal-title { color: var(--quinta); }
-.quinta .meal-title::after { background: var(--quinta-dark); }
-.sexta .meal-title { color: var(--sexta); }
-.sexta .meal-title::after { background: var(--sexta-dark); }
-.sabado .meal-title { color: var(--sabado); }
-.sabado .meal-title::after { background: var(--sabado-dark); }
-
-/* Icon Colors Header */
-.fa-sun { color: var(--quarta); }
-.fa-calendar-days { color: var(--sexta); }
-.fa-utensils { color: var(--quinta); }
-.fa-list { color: var(--segunda); }
-
-/* Loading & Error States */
-.loading-msg {
-    padding: var(--space-xl);
-    text-align: center;
-    color: var(--text-primary);
-    font-size: var(--font-md);
+.domingo .card-header {
+    background: var(--domingo);
+    color: var(--domingo-dark);
 }
 
-.error-msg {
-    padding: var(--space-xl);
-    text-align: center;
+.segunda .card-header {
+    background: var(--segunda);
+    color: var(--segunda-dark);
+}
+
+.terca .card-header {
+    background: var(--terca);
+    color: var(--terca-dark);
+}
+
+.quarta .card-header {
+    background: var(--quarta);
+    color: var(--quarta-dark);
+}
+
+.quinta .card-header {
+    background: var(--quinta);
+    color: var(--quinta-dark);
+}
+
+.sexta .card-header {
+    background: var(--sexta);
+    color: var(--sexta-dark);
+}
+
+.sabado .card-header {
+    background: var(--sabado);
+    color: var(--sabado-dark);
+}
+
+.domingo .meal-title {
+    color: var(--domingo);
+}
+
+.segunda .meal-title {
     color: var(--segunda);
-    font-size: var(--font-md);
 }
 
-.error-msg i {
-    margin-bottom: var(--space-sm);
-    font-size: 24px;
-    display: block;
+.terca .meal-title {
+    color: var(--terca);
+}
+
+.quarta .meal-title {
+    color: var(--quarta);
+}
+
+.quinta .meal-title {
+    color: var(--quinta);
+}
+
+.sexta .meal-title {
+    color: var(--sexta);
+}
+
+.sabado .meal-title {
+    color: var(--sabado);
 }

@@ -141,10 +141,60 @@ function renderHoje(app) {
     app.innerHTML = `
         <div class="date-display">
             <span class="day-label">${dayLabels[day]}</span>
-            <span class="date-label">${dateStr}</span>
+            <span class="date-label" style="color: var(--teal-primary)">${dateStr}</span>
         </div>
     `;
 
+    const container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.gap = "var(--block-margin)";
+    app.appendChild(container);
+
+    renderDayCards(container, day, meals);
+}
+
+function renderSemana(app) {
+    // Seletor de dias (Submenu)
+    const selector = document.createElement("div");
+    selector.className = "day-selector";
+    
+    const shortDays = { domingo: "D", segunda: "S", terca: "T", quarta: "Q", quinta: "Q", sexta: "S", sabado: "S" };
+    const today = getToday();
+
+    days.forEach(day => {
+        const btn = document.createElement("button");
+        btn.className = `day-btn ${day === today ? 'active' : ''}`;
+        btn.innerText = shortDays[day];
+        btn.onclick = () => {
+            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            filterWeekDay(day);
+        };
+        selector.appendChild(btn);
+    });
+
+    app.appendChild(selector);
+
+    const cardsContainer = document.createElement("div");
+    cardsContainer.id = "week-cards-container";
+    cardsContainer.style.display = "flex";
+    cardsContainer.style.flexDirection = "column";
+    cardsContainer.style.gap = "var(--block-margin)";
+    app.appendChild(cardsContainer);
+
+    filterWeekDay(today);
+}
+
+function filterWeekDay(day) {
+    const container = document.querySelector("#week-cards-container");
+    if (!container) return;
+    container.innerHTML = "";
+    const meals = normalize(weekMeals[day]);
+    renderDayCards(container, day, meals);
+}
+
+function renderDayCards(container, day, meals) {
     meals.forEach(meal => {
         const card = document.createElement("div");
         card.className = `card ${day}`;
@@ -155,37 +205,12 @@ function renderHoje(app) {
                 const icon = categoryIcons[data.category] || categoryIcons["Geral"];
                 return `<div class="row"><span>${icon} ${data.name}</span><span>${data.qty}</span></div>`;
             }).join("")
-            : `<div class="row"><span>${EMPTY_ICON} Nenhum alimento planejado</span><span>${EMPTY_ICON}</span></div>`;
+            : `<div class="row"><span>${EMPTY_ICON} Nada planejado</span><span>${EMPTY_ICON}</span></div>`;
 
         card.innerHTML = `
             <div class="card-header">${meal.name} - ${meal.time}</div>
             <div class="card-content">${foodsHtml}</div>`;
-        app.appendChild(card);
-    });
-}
-
-function renderSemana(app) {
-    days.forEach(day => {
-        const meals = normalize(weekMeals[day]);
-        const card = document.createElement("div");
-        card.className = `card ${day}`;
-
-        card.innerHTML = `
-            <div class="card-header">${dayLabels[day]}</div>
-            <div class="card-content">
-                ${meals.map(meal => `
-                    <div class="meal-title">${meal.name}</div>
-                    ${meal.foods.length > 0 
-                        ? meal.foods.map(id => {
-                            const data = getItemData(id);
-                            const icon = categoryIcons[data.category] || categoryIcons["Geral"];
-                            return `<div class="row"><span>${icon} ${data.name}</span><span>${data.qty}</span></div>`;
-                        }).join("")
-                        : `<div class="row"><span>Vazio</span><span>${EMPTY_ICON}</span></div>`
-                    }
-                `).join("")}
-            </div>`;
-        app.appendChild(card);
+        container.appendChild(card);
     });
 }
 
@@ -249,10 +274,10 @@ function navigate(route) {
     const headerSpan = document.querySelector(".app-header span");
     
     const pageTitles = {
-        hoje: '<i class="fa-solid fa-sun"></i> Hoje',
-        semana: '<i class="fa-solid fa-calendar-days"></i> Plano Semanal',
-        refeicoes: '<i class="fa-solid fa-utensils"></i> Sugestão de refeições',
-        itens: '<i class="fa-solid fa-list"></i> Lista de alimentos'
+        hoje: '<i class="fa-solid fa-calendar-day"></i> Hoje',
+        semana: '<i class="fa-solid fa-calendar-days"></i> Semana',
+        refeicoes: '<i class="fa-solid fa-utensils"></i> Sugestões',
+        itens: '<i class="fa-solid fa-list-ul"></i> Alimentos'
     };
 
     if (headerSpan && pageTitles[route]) headerSpan.innerHTML = pageTitles[route];

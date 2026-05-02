@@ -1,5 +1,5 @@
 // ─────────────────────────────
-// ⚙️ SECTION: CONFIGURAÇÃO PLANILHA
+// ⚙️ SECTION: CONFIGURAÇÃO
 // ─────────────────────────────
 
 const SHEET_ID = '1FgvbAHH5qQHVCP1ySo5Dss_oOdkXYXOn4uRqzwvkUyQ';
@@ -8,7 +8,6 @@ let items = {};
 let baseMeals = [];
 let weekMeals = {};
 
-// Mapa de ícones por categoria
 const categoryIcons = {
     "Proteínas": '<i class="fa-solid fa-drumstick-bite"></i>',
     "Carboidratos": '<i class="fa-solid fa-wheat-awn"></i>',
@@ -21,8 +20,17 @@ const categoryIcons = {
     "Geral": '<i class="fa-solid fa-bowl-food"></i>'
 };
 
+const mealIcons = {
+    "Café da Manhã": '<i class="fa-solid fa-mug-hot"></i>',
+    "Almoço": '<i class="fa-solid fa-utensils"></i>',
+    "Lanche": '<i class="fa-solid fa-apple-whole"></i>',
+    "Jantar": '<i class="fa-solid fa-bowl-food"></i>',
+    "Ceia": '<i class="fa-solid fa-moon"></i>',
+    "Geral": '<i class="fa-solid fa-utensils"></i>'
+};
+
 // ─────────────────────────────
-// 🌐 SECTION: MOTOR DE DADOS (GOOGLE SHEETS)
+// 🌐 SECTION: MOTOR DE DADOS
 // ─────────────────────────────
 
 async function fetchSheetData(tabName) {
@@ -35,7 +43,7 @@ async function fetchSheetData(tabName) {
 
 async function initApp() {
     const app = document.querySelector("#app");
-    app.innerHTML = "<div class='loading-msg'>Carregando cardápio...</div>";
+    app.innerHTML = "<div style='text-align:center; padding:50px; opacity:0.5'>Carregando cardápio...</div>";
 
     try {
         const [rowsConfig, rowsAlimentos, rowsAgenda] = await Promise.all([
@@ -44,7 +52,6 @@ async function initApp() {
             fetchSheetData('Agenda')
         ]);
 
-        // 1. Processar Horários - Pula a primeira linha (cabeçalho)
         baseMeals = rowsConfig.slice(1).map(r => {
             if (!r.c || !r.c[0]) return null;
             return {
@@ -53,31 +60,25 @@ async function initApp() {
             };
         }).filter(Boolean);
 
-        // 2. Processar Alimentos - Pula a primeira linha
         items = {};
         rowsAlimentos.slice(1).forEach(r => {
             if (!r.c || !r.c[0]) return;
             const id = String(r.c[0].v).trim();
             items[id] = {
                 name: r.c[1] ? r.c[1].v : "Item",
-                qty: (r.c[2] && r.c[2].v) ? r.c[2].v : '<i class="fa-solid fa-circle-minus" style="opacity:0.2"></i>',
+                qty: (r.c[2] && r.c[2].v) ? r.c[2].v : '---',
                 category: r.c[3] ? r.c[3].v : "Geral"
             };
         });
 
-        // 3. Processar Agenda - Pula a primeira linha
         weekMeals = { domingo: [], segunda: [], terca: [], quarta: [], quinta: [], sexta: [], sabado: [] };
-        
         rowsAgenda.slice(1).forEach(r => {
             if (!r.c || !r.c[0] || !r.c[1]) return;
-            
             const diaRaw = r.c[0].v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const dia = diaRaw === "terca" ? "terca" : diaRaw;
-            
             const refeicao = r.c[1].v;
             const alimentosRaw = r.c[2] ? String(r.c[2].v) : "";
             const alimentosIds = alimentosRaw ? alimentosRaw.split(',').map(s => s.trim()) : [];
-
             const config = baseMeals.find(m => m.name === refeicao);
             
             if (weekMeals[dia]) {
@@ -90,14 +91,9 @@ async function initApp() {
         });
 
         navigate("hoje");
-
     } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        app.innerHTML = `
-            <div class="error-msg">
-                <i class="fa-solid fa-circle-exclamation"></i><br>
-                Erro ao carregar os dados da planilha.
-            </div>`;
+        console.error("Erro:", error);
+        app.innerHTML = `<div style="text-align:center; padding:50px; color:var(--segunda)">Erro ao carregar dados.</div>`;
     }
 }
 
@@ -106,21 +102,11 @@ async function initApp() {
 // ─────────────────────────────
 
 const days = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
-
-const dayLabels = {
-    domingo: "Domingo", segunda: "Segunda", terca: "Terça",
-    quarta: "Quarta", quinta: "Quinta", sexta: "Sexta", sabado: "Sábado"
-};
-
+const dayLabels = { domingo: "Domingo", segunda: "Segunda", terca: "Terça", quarta: "Quarta", quinta: "Quinta", sexta: "Sexta", sabado: "Sábado" };
 const EMPTY_ICON = '<i class="fa-solid fa-circle-minus" style="opacity:0.2"></i>';
 
-function getToday() {
-    return days[new Date().getDay()];
-}
-
-function getItemData(id) {
-    return items[id] || { name: id, qty: EMPTY_ICON, category: "Geral" };
-}
+function getToday() { return days[new Date().getDay()]; }
+function getItemData(id) { return items[id] || { name: id, qty: '---', category: "Geral" }; }
 
 function normalize(dayMeals) {
     return baseMeals.map(base => {
@@ -141,7 +127,7 @@ function renderHoje(app) {
     app.innerHTML = `
         <div class="date-display">
             <span class="day-label">${dayLabels[day]}</span>
-            <span class="date-label" style="color: var(--teal-primary)">${dateStr}</span>
+            <span class="date-label">${dateStr}</span>
         </div>
     `;
 
@@ -155,10 +141,8 @@ function renderHoje(app) {
 }
 
 function renderSemana(app) {
-    // Seletor de dias (Submenu)
     const selector = document.createElement("div");
     selector.className = "day-selector";
-    
     const shortDays = { domingo: "D", segunda: "S", terca: "T", quarta: "Q", quinta: "Q", sexta: "S", sabado: "S" };
     const today = getToday();
 
@@ -175,7 +159,6 @@ function renderSemana(app) {
     });
 
     app.appendChild(selector);
-
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "week-cards-container";
     cardsContainer.style.display = "flex";
@@ -190,14 +173,14 @@ function filterWeekDay(day) {
     const container = document.querySelector("#week-cards-container");
     if (!container) return;
     container.innerHTML = "";
-    const meals = normalize(weekMeals[day]);
-    renderDayCards(container, day, meals);
+    renderDayCards(container, day, normalize(weekMeals[day]));
 }
 
 function renderDayCards(container, day, meals) {
     meals.forEach(meal => {
         const card = document.createElement("div");
         card.className = `card ${day}`;
+        const mIcon = mealIcons[meal.name] || mealIcons["Geral"];
 
         const foodsHtml = meal.foods.length > 0 
             ? meal.foods.map(id => {
@@ -205,10 +188,10 @@ function renderDayCards(container, day, meals) {
                 const icon = categoryIcons[data.category] || categoryIcons["Geral"];
                 return `<div class="row"><span>${icon} ${data.name}</span><span>${data.qty}</span></div>`;
             }).join("")
-            : `<div class="row"><span>${EMPTY_ICON} Nada planejado</span><span>${EMPTY_ICON}</span></div>`;
+            : `<div class="row" style="opacity:0.3"><span>${EMPTY_ICON} Nada planejado</span><span></span></div>`;
 
         card.innerHTML = `
-            <div class="card-header">${meal.name} - ${meal.time}</div>
+            <div class="card-header">${mIcon} ${meal.name} - ${meal.time}</div>
             <div class="card-content">${foodsHtml}</div>`;
         container.appendChild(card);
     });
@@ -216,6 +199,7 @@ function renderDayCards(container, day, meals) {
 
 function renderRefeicoes(app) {
     baseMeals.forEach(meal => {
+        const mIcon = mealIcons[meal.name] || mealIcons["Geral"];
         const allowed = Object.values(items).filter(i => {
             const itemKey = Object.keys(items).find(key => items[key] === i);
             return Object.values(weekMeals).some(dayList => 
@@ -226,14 +210,14 @@ function renderRefeicoes(app) {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-            <div class="card-header">${meal.name}</div>
+            <div class="card-header">${mIcon} ${meal.name}</div>
             <div class="card-content">
                 ${allowed.length > 0 
                     ? allowed.map(i => {
                         const icon = categoryIcons[i.category] || categoryIcons["Geral"];
                         return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
                     }).join("")
-                    : `<div class="row"><span>Sem itens vinculados</span><span>${EMPTY_ICON}</span></div>`
+                    : `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`
                 }
             </div>`;
         app.appendChild(card);
@@ -251,12 +235,11 @@ function renderItens(app) {
         const card = document.createElement("div");
         card.className = "card";
         const catIcon = categoryIcons[cat] || categoryIcons["Geral"];
-        
         card.innerHTML = `
             <div class="card-header">${catIcon} ${cat}</div>
             <div class="card-content">
                 ${grouped[cat].sort((a,b) => a.name.localeCompare(b.name)).map(i => `
-                    <div class="row"><span>${i.name}</span><span>${i.qty}</span></div>
+                    <div class="row"><span>${categoryIcons[i.category] || categoryIcons["Geral"]} ${i.name}</span><span>${i.qty}</span></div>
                 `).join("")}
             </div>`;
         app.appendChild(card);
@@ -264,7 +247,7 @@ function renderItens(app) {
 }
 
 // ─────────────────────────────
-// 🔄 SECTION: ROUTER & NAVEGAÇÃO
+// 🔄 SECTION: ROUTER
 // ─────────────────────────────
 
 const routes = { hoje: renderHoje, semana: renderSemana, refeicoes: renderRefeicoes, itens: renderItens };
@@ -273,22 +256,22 @@ function navigate(route) {
     const app = document.querySelector("#app");
     const headerSpan = document.querySelector(".app-header span");
     
+    // Títulos dinâmicos por página
     const pageTitles = {
-        hoje: '<i class="fa-solid fa-calendar-day"></i> Hoje',
-        semana: '<i class="fa-solid fa-calendar-days"></i> Semana',
-        refeicoes: '<i class="fa-solid fa-utensils"></i> Sugestões',
-        itens: '<i class="fa-solid fa-list-ul"></i> Alimentos'
+        hoje: '<i class="fa-solid fa-calendar-day"></i> Cardápio para hoje',
+        semana: '<i class="fa-solid fa-calendar-days"></i> Cardápio semanal',
+        refeicoes: '<i class="fa-solid fa-utensils"></i> Sugestões de refeições',
+        itens: '<i class="fa-solid fa-list-ul"></i> Lista de alimentos'
     };
 
-    if (headerSpan && pageTitles[route]) headerSpan.innerHTML = pageTitles[route];
-
+    if (headerSpan) headerSpan.innerHTML = pageTitles[route];
+    
     app.innerHTML = "";
     if (routes[route]) routes[route](app);
 
     document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
     const targetBtn = document.querySelector(`[data-route="${route}"]`);
     if (targetBtn) targetBtn.classList.add("active");
-
     window.scrollTo(0, 0);
 }
 

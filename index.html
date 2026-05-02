@@ -3,60 +3,68 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
   <link rel="shortcut icon" href="/icon.png" type="image/x-icon">
-
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
 
-  <title>Cardápio</title>
+  <title>Cardápio Inteligente para Edvirges</title>
 </head>
 
 <body>
 
   <!-- ─────────────────────────────
-    🍽️ SECTION: Headerr
+    🍽️ SECTION: Header
   ───────────────────────────── -->
   <header class="app-header">
-    <span>Cardápio Inteligente</span>
+    <span>
+      Cardápio Inteligente<br>para Edvirges
+    </span>
   </header>
 
+  <!-- Onde o JavaScript renderiza os cards -->
   <main id="app"></main>
 
+  <!-- ─────────────────────────────
+    🧭 SECTION: Navigation
+  ───────────────────────────── -->
   <nav class="bottom-nav">
     <button data-route="hoje" class="active">
-      <i class="fa-solid fa-sun"></i>
-      <span>Diário</span>
+      <i class="fa-solid fa-calendar-day"></i>
+      <span>Hoje</span>
     </button>
 
     <button data-route="semana">
-      <i class="fa-solid fa-calendar"></i>
-      <span>Semanal</span>
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Semana</span>
     </button>
 
     <button data-route="refeicoes">
       <i class="fa-solid fa-utensils"></i>
-      <span>Refeições</span>
+      <span>Sugestões</span>
     </button>
 
     <button data-route="itens">
-      <i class="fa-solid fa-list"></i>
+      <i class="fa-solid fa-list-ul"></i>
       <span>Alimentos</span>
     </button>
   </nav>
 
+  <!-- Scripts -->
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("App pronto para uso!"));
+        .then(() => console.log("PWA: Service Worker registrado com sucesso!"));
     }
   </script>
 </body>

@@ -90,7 +90,6 @@ async function initApp() {
             }
         });
 
-        // Agora inicia sempre pela aba Semana
         navigate("semana");
     } catch (error) {
         console.error("Erro:", error);
@@ -124,17 +123,18 @@ function renderSemana(app) {
     const today = getToday();
     const dateStr = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
 
-    // Novo cabeçalho de data dinâmico dentro do app
+    // Cabeçalho com animação
     const dateHeader = document.createElement("div");
-    dateHeader.className = "date-display";
+    dateHeader.className = "date-display anim-up";
     dateHeader.innerHTML = `
         <span class="day-label" id="current-day-name">${dayLabels[today]}</span>
         <span class="date-label">${dateStr}</span>
     `;
     app.appendChild(dateHeader);
 
+    // Seletor com animação
     const selector = document.createElement("div");
-    selector.className = "day-selector";
+    selector.className = "day-selector anim-up";
     const shortDays = { domingo: "D", segunda: "S", terca: "T", quarta: "Q", quinta: "Q", sexta: "S", sabado: "S" };
 
     days.forEach(day => {
@@ -154,6 +154,7 @@ function renderSemana(app) {
 
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "week-cards-container";
+    cardsContainer.className = "anim-up";
     cardsContainer.style.display = "flex";
     cardsContainer.style.flexDirection = "column";
     cardsContainer.style.gap = "var(--block-margin)";
@@ -191,33 +192,53 @@ function renderDayCards(container, day, meals) {
 }
 
 function renderRefeicoes(app) {
+    // Container para aplicar animação em tudo de uma vez
+    const container = document.createElement("div");
+    container.className = "anim-up";
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.gap = "var(--block-margin)";
+    app.appendChild(container);
+
     baseMeals.forEach(meal => {
         const mIcon = mealIcons[meal.name] || mealIcons["Geral"];
-        const allowed = Object.values(items).filter(i => {
-            const itemKey = Object.keys(items).find(key => items[key] === i);
-            return Object.values(weekMeals).some(dayList => 
-                dayList.some(m => m.name === meal.name && m.foods.includes(itemKey))
-            );
+        
+        // Otimização: Filtra itens que aparecem nesta refeição específica em qualquer dia da semana
+        const allowedIds = new Set();
+        Object.values(weekMeals).forEach(dayList => {
+            dayList.forEach(m => {
+                if (m.name === meal.name) {
+                    m.foods.forEach(id => allowedIds.add(id));
+                }
+            });
         });
 
         const card = document.createElement("div");
         card.className = "card";
+        
+        let contentHtml = "";
+        if (allowedIds.size > 0) {
+            contentHtml = Array.from(allowedIds).map(id => {
+                const i = getItemData(id);
+                const icon = categoryIcons[i.category] || categoryIcons["Geral"];
+                return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
+            }).join("");
+        } else {
+            contentHtml = `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`;
+        }
+
         card.innerHTML = `
             <div class="card-header">${mIcon} ${meal.name}</div>
-            <div class="card-content">
-                ${allowed.length > 0 
-                    ? allowed.map(i => {
-                        const icon = categoryIcons[i.category] || categoryIcons["Geral"];
-                        return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
-                    }).join("")
-                    : `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`
-                }
-            </div>`;
-        app.appendChild(card);
+            <div class="card-content">${contentHtml}</div>`;
+        container.appendChild(card);
     });
 }
 
 function renderItens(app) {
+    const container = document.createElement("div");
+    container.className = "anim-up";
+    app.appendChild(container);
+
     const grouped = {};
     Object.values(items).forEach(i => {
         if (!grouped[i.category]) grouped[i.category] = [];
@@ -227,15 +248,20 @@ function renderItens(app) {
     Object.keys(grouped).sort().forEach(cat => {
         const card = document.createElement("div");
         card.className = "card";
+        card.style.marginBottom = "var(--block-margin)";
         const catIcon = categoryIcons[cat] || categoryIcons["Geral"];
+        
+        const contentHtml = grouped[cat]
+            .sort((a,b) => a.name.localeCompare(b.name))
+            .map(i => {
+                const icon = categoryIcons[i.category] || categoryIcons["Geral"];
+                return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
+            }).join("");
+
         card.innerHTML = `
             <div class="card-header">${catIcon} ${cat}</div>
-            <div class="card-content">
-                ${grouped[cat].sort((a,b) => a.name.localeCompare(b.name)).map(i => `
-                    <div class="row"><span>${categoryIcons[i.category] || categoryIcons["Geral"]} ${i.name}</span><span>${i.qty}</span></div>
-                `).join("")}
-            </div>`;
-        app.appendChild(card);
+            <div class="card-content">${contentHtml}</div>`;
+        container.appendChild(card);
     });
 }
 
@@ -243,19 +269,14 @@ function renderItens(app) {
 // 🔄 SECTION: ROUTER
 // ─────────────────────────────
 
-// Removida a rota 'hoje'
 const routes = { semana: renderSemana, refeicoes: renderRefeicoes, itens: renderItens };
 
 function navigate(route) {
     const app = document.querySelector("#app");
-    
-    // Limpa o conteúdo atual
     app.innerHTML = "";
     
-    // Executa a função de renderização da rota
     if (routes[route]) routes[route](app);
 
-    // Atualiza o estado visual dos botões do menu inferior
     document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
     const targetBtn = document.querySelector(`[data-route="${route}"]`);
     if (targetBtn) targetBtn.classList.add("active");
@@ -267,5 +288,4 @@ document.querySelectorAll(".bottom-nav button").forEach(b => {
     b.addEventListener("click", () => navigate(b.dataset.route));
 });
 
-// Inicialização oficial
 document.addEventListener("DOMContentLoaded", initApp);

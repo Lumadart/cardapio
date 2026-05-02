@@ -1,9 +1,9 @@
-const CACHE_NAME = 'cardapio-v1.2'; // Atualizado para v1.2 para forçar o celular a baixar o novo código
+const CACHE_NAME = 'cardapio-v1.1'; 
 const assets = [
   './',
   './index.html',
-  './styles.css?v=1.1', // Certifique-se de que no index.html também esteja v=1.1
-  './app.js?v=1.1',     // Certifique-se de que no index.html também esteja v=1.1
+  './styles.css?v=1.1', 
+  './app.js?v=1.1',  
   './manifest.json',
   './icon.png',
   'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap',
@@ -18,7 +18,7 @@ self.addEventListener('install', e => {
       return cache.addAll(assets);
     })
   );
-  self.skipWaiting(); // Força o novo SW a assumir o controle imediatamente
+  self.skipWaiting(); 
 });
 
 // Ativação: Remove caches antigos

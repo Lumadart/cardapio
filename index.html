@@ -23,11 +23,19 @@
     <!-- ─────────────────────────────
       🍽️ SECTION: OPEN GRAPH / SOCIAL
     ───────────────────────────── -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Cardápio para Edvirges">
-    <meta property="og:description" content="Planejamento semanal de refeições personalizado.">
-    <meta property="og:image" content="icon.png">
-    <meta property="og:locale" content="pt_BR">
+ <!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lumadart.github.io/cardapio/">
+<meta property="og:title" content="Cardápio Inteligente para Edvirges">
+<meta property="og:description" content="Planejamento semanal de refeições e gerenciamento de alimentos.">
+<meta property="og:image" content="https://lumadart.github.io/cardapio/icon-large.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://lumadart.github.io/cardapio/">
+<meta property="twitter:title" content="Cardápio Inteligente para Edvirges">
+<meta property="twitter:description" content="Planejamento semanal de refeições e gerenciamento de alimentos.">
+<meta property="twitter:image" content="https://lumadart.github.io/cardapio/icon-large.png">
 
     <!-- ─────────────────────────────
       🍽️ SECTION: FAVICON & PWA ASSETS
@@ -115,7 +123,7 @@
             });
         }
 
-        // Função básica para fechar o modal (será usada pelo app.js)
+        // Função para fechar o modal
         function closeModal(event) {
             document.getElementById('recipe-modal').classList.remove('active');
         }

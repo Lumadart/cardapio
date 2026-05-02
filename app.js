@@ -123,23 +123,24 @@ function renderSemana(app) {
     const today = getToday();
     const dateStr = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
 
-    // Cabeçalho com animação
     const dateHeader = document.createElement("div");
     dateHeader.className = "date-display anim-up";
     dateHeader.innerHTML = `
         <span class="day-label" id="current-day-name">${dayLabels[today]}</span>
-        <span class="date-label">${dateStr}</span>
+        <span class="date-label">${dayLabels[today]} - ${dateStr}</span>
     `;
     app.appendChild(dateHeader);
 
-    // Seletor com animação
     const selector = document.createElement("div");
     selector.className = "day-selector anim-up";
     const shortDays = { domingo: "D", segunda: "S", terca: "T", quarta: "Q", quinta: "Q", sexta: "S", sabado: "S" };
 
     days.forEach(day => {
         const btn = document.createElement("button");
-        btn.className = `day-btn ${day === today ? 'active' : ''}`;
+        // LÓGICA: Adiciona 'active' se for o selecionado, e 'is-today' se for o dia real de hoje
+        const isActive = (day === today);
+        btn.className = `day-btn ${isActive ? 'active' : ''} ${day === today ? 'is-today' : ''}`;
+        
         btn.innerText = shortDays[day];
         btn.onclick = () => {
             document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
@@ -192,7 +193,6 @@ function renderDayCards(container, day, meals) {
 }
 
 function renderRefeicoes(app) {
-    // Container para aplicar animação em tudo de uma vez
     const container = document.createElement("div");
     container.className = "anim-up";
     container.style.display = "flex";
@@ -202,8 +202,6 @@ function renderRefeicoes(app) {
 
     baseMeals.forEach(meal => {
         const mIcon = mealIcons[meal.name] || mealIcons["Geral"];
-        
-        // Otimização: Filtra itens que aparecem nesta refeição específica em qualquer dia da semana
         const allowedIds = new Set();
         Object.values(weekMeals).forEach(dayList => {
             dayList.forEach(m => {
@@ -216,16 +214,13 @@ function renderRefeicoes(app) {
         const card = document.createElement("div");
         card.className = "card";
         
-        let contentHtml = "";
-        if (allowedIds.size > 0) {
-            contentHtml = Array.from(allowedIds).map(id => {
+        let contentHtml = allowedIds.size > 0 
+            ? Array.from(allowedIds).map(id => {
                 const i = getItemData(id);
                 const icon = categoryIcons[i.category] || categoryIcons["Geral"];
                 return `<div class="row"><span>${icon} ${i.name}</span><span>${i.qty}</span></div>`;
-            }).join("");
-        } else {
-            contentHtml = `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`;
-        }
+            }).join("")
+            : `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`;
 
         card.innerHTML = `
             <div class="card-header">${mIcon} ${meal.name}</div>

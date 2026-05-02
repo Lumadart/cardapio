@@ -147,6 +147,12 @@ html {
     color: var(--bg-main);
 }
 
+/* Cor para o dia de HOJE quando não estiver selecionado */
+.day-btn.is-today:not(.active) {
+    background-color: var(--teal-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Opcional: uma bordinha sutil */
+}
+
 /* ─────────────────────────────
     🍽️ SECTION: Cards & Rows
    ───────────────────────────── */

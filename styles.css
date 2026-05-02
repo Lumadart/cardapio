@@ -1,58 +1,53 @@
 /* ─────────────────────────────
-    🍽️ SECTION: Design Tokens
+    🍽️ Design Tokens
    ───────────────────────────── */
 :root {
+    /* Tipografia */
     --font-family: "Montserrat", sans-serif;
     --font-xs: 12px;
     --font-sm: 14px;
     --font-md: 16px;
     --font-weight-semibold: 600;
 
+    /* Espaçamento */
     --space-xxs: 4px;
     --space-sm: 8px;
     --space-md: 10px;
     --space-lg: 14px;
     --space-xl: 16px;
 
+    /* Componentes */
     --block-margin: var(--space-lg);
     --radius: 14px;
     --radius-sm: 8px;
     --border-width: 1px;
-
     --nav-height: 70px;
     --container-max-width: 600px;
 
+    /* Cores de Interface */
     --bg-main: #0f1115;
     --bg-card: #1a1d23;
     --text-primary: #e6e6e6;
     --text-muted: #a0a6b1;
     --divider: #2a2f38;
-
     --teal-primary: #14b8a6;
     --teal-dark: #0f766e;
     --gray-5: #232730;
 
-    --domingo: #d96c9d;
-    --domingo-dark: #6f2a4a;
-    --segunda: #d96c6c;
-    --segunda-dark: #6f2a2a;
-    --terca: #d9916c;
-    --terca-dark: #6f452a;
-    --quarta: #d9c46c;
-    --quarta-dark: #6f5f2a;
-    --quinta: #6cd98a;
-    --quinta-dark: #2a6f45;
-    --sexta: #6caed9;
-    --sexta-dark: #2a4f6f;
-    --sabado: #a66cd9;
-    --sabado-dark: #4a2a6f;
+    /* Cores dos Dias da Semana */
+    --domingo: #d96c9d; --domingo-dark: #6f2a4a;
+    --segunda: #d96c6c; --segunda-dark: #6f2a2a;
+    --terca: #d9916c;   --terca-dark: #6f452a;
+    --quarta: #d9c46c;  --quarta-dark: #6f5f2a;
+    --quinta: #6cd98a;  --quinta-dark: #2a6f45;
+    --sexta: #6caed9;   --sexta-dark: #2a4f6f;
+    --sabado: #a66cd9;  --sabado-dark: #4a2a6f;
 
-    /* Overlay para o modal */
     --modal-overlay: rgba(0, 0, 0, 0.85);
 }
 
 /* ─────────────────────────────
-    🍽️ SECTION: Base & Scroll
+    🍽️ Base & Reset
    ───────────────────────────── */
 * {
     margin: 0;
@@ -64,6 +59,7 @@ body {
     font-family: var(--font-family);
     background: var(--bg-main);
     color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
 }
 
 html {
@@ -75,17 +71,20 @@ html {
     touch-action: manipulation;
 }
 
-/* ─────────────────────────────
-    🍽️ SECTION: Layout
-   ───────────────────────────── */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+.anim-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* ─────────────────────────────
+    🍽️ Layout & States
+   ───────────────────────────── */
 #app {
     padding: var(--space-xl);
-    padding-top: var(--space-xl);
     padding-bottom: calc(var(--nav-height) + var(--space-xl));
     display: flex;
     flex-direction: column;
@@ -96,19 +95,29 @@ html {
     #app { max-width: var(--container-max-width); margin: 0 auto; }
 }
 
+.loading-msg, .error-msg {
+    text-align: center;
+    padding: 50px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.loading-msg { opacity: 0.5; }
+.error-msg { color: var(--segunda); }
+
+/* ─────────────────────────────
+    📅 Header & Selectors
+   ───────────────────────────── */
 .date-display {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: var(--space-sm);
     padding: 0 var(--space-xxs);
-    animation: fadeInUp 0.4s ease-out;
 }
 
 .day-label {
     font-weight: var(--font-weight-semibold);
     font-size: 1.2rem;
-    color: var(--text-primary);
 }
 
 .date-label {
@@ -117,9 +126,6 @@ html {
     font-weight: var(--font-weight-semibold);
 }
 
-/* ─────────────────────────────
-    📅 SECTION: Submenu de Dias
-   ───────────────────────────── */
 .day-selector {
     display: flex;
     justify-content: space-between;
@@ -141,7 +147,7 @@ html {
     font-size: var(--font-xs);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s ease;
 }
 
 .day-btn.active {
@@ -155,14 +161,19 @@ html {
 }
 
 /* ─────────────────────────────
-    🍽️ SECTION: Cards & Rows
+    🍽️ Cards & Accordion
    ───────────────────────────── */
+.cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--block-margin);
+}
+
 .card {
     background: var(--bg-card);
     border-radius: var(--radius);
     border: var(--border-width) solid var(--divider);
     overflow: hidden;
-    animation: fadeInUp 0.4s ease-out forwards;
 }
 
 .card-header {
@@ -170,23 +181,62 @@ html {
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-md);
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.card-header span:first-child {
+    display: flex;
     align-items: center;
     gap: var(--space-sm);
 }
 
+/* Cor padrão para categorias/refeições (fora da aba semana) */
 .card:not(.domingo):not(.segunda):not(.terca):not(.quarta):not(.quinta):not(.sexta):not(.sabado) .card-header {
     background: var(--teal-primary);
     color: var(--teal-dark);
 }
 
-.card:not(.domingo):not(.segunda):not(.terca):not(.quarta):not(.quinta):not(.sexta):not(.sabado) .card-header i {
-    color: var(--teal-dark);
+.item-counter {
+    opacity: 0.7;
+    font-size: 0.75em;
+    margin-left: 5px;
 }
 
+.accordion-arrow {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.card:not(.collapsed) .accordion-arrow {
+    transform: rotate(180deg);
+}
+
+/* Conteúdo com animação suave */
 .card-content {
+    max-height: 2000px;
+    opacity: 1;
     padding: var(--space-lg);
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.3s ease, 
+                padding 0.4s ease;
 }
 
+.card.collapsed .card-content {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────
+    🍽️ Rows & Items
+   ───────────────────────────── */
 .row {
     display: flex;
     justify-content: space-between;
@@ -195,17 +245,12 @@ html {
     align-items: center;
 }
 
+.row:last-child { margin-bottom: 0; }
+
 .row span:first-child {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-}
-
-.row i {
-    color: var(--text-muted);
-    font-size: 1rem;
-    width: 18px;
-    text-align: center;
 }
 
 .row span:last-child {
@@ -216,10 +261,29 @@ html {
     color: var(--text-muted);
 }
 
-/* 🟢 Estilo para itens com receita */
+/* Controle de ícones nas rows */
+.row i {
+    display: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    width: 18px;
+    text-align: center;
+}
+
+/* Ícones aparecem apenas em cards com classe de dia da semana */
+.card[class*="segunda"] .row i, .card[class*="terca"] .row i, 
+.card[class*="quarta"] .row i, .card[class*="quinta"] .row i, 
+.card[class*="sexta"] .row i, .card[class*="sabado"] .row i, 
+.card[class*="domingo"] .row i {
+    display: inline-block;
+}
+
+.empty-row { opacity: 0.3; }
+.empty-style { opacity: 0.2; }
+
+/* Receitas */
 .has-recipe {
     color: var(--teal-primary) !important;
-    text-decoration: none;
     cursor: pointer;
 }
 
@@ -227,17 +291,15 @@ html {
     font-size: 0.7rem;
     margin-left: var(--space-xxs);
     opacity: 0.7;
+    display: inline-block !important;
 }
 
 /* ─────────────────────────────
-    🍳 SECTION: Modal de Receitas
+    🍳 Modal de Receitas
    ───────────────────────────── */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: var(--modal-overlay);
     display: none;
     justify-content: center;
@@ -246,9 +308,7 @@ html {
     backdrop-filter: blur(4px);
 }
 
-.modal-overlay.active {
-    display: flex;
-}
+.modal-overlay.active { display: flex; }
 
 .modal-content {
     background: var(--bg-card);
@@ -260,7 +320,7 @@ html {
     padding: var(--space-xl);
     border: var(--border-width) solid var(--divider);
     border-bottom: none;
-    position: relative;
+    animation: fadeInUp 0.3s ease-out;
 }
 
 .modal-header {
@@ -307,9 +367,7 @@ html {
     font-size: var(--font-md);
     font-weight: var(--font-weight-semibold);
     margin: var(--space-xl) 0 var(--space-sm) 0;
-    color: var(--text-primary);
-    border-left: 3px solid var(--teal-primary);
-    padding-left: var(--space-sm);
+    color: var(--teal-primary);
 }
 
 .recipe-prep-text {
@@ -322,25 +380,8 @@ html {
     white-space: pre-wrap;
 }
 
-.modal-footer {
-    margin-top: var(--space-xl);
-    padding-bottom: var(--space-sm);
-}
-
-.btn-confirm {
-    width: 100%;
-    padding: var(--space-lg);
-    border-radius: var(--radius);
-    border: none;
-    background: var(--teal-primary);
-    color: var(--bg-main);
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-md);
-    cursor: pointer;
-}
-
 /* ─────────────────────────────
-    🧭 SECTION: Navigation
+    🧭 Navigation
    ───────────────────────────── */
 .bottom-nav {
     position: fixed;
@@ -362,8 +403,8 @@ html {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .bottom-nav button i {
@@ -379,12 +420,13 @@ html {
     content: "";
     position: absolute;
     top: 0;
-    width: 100%;
+    width: 40%;
     height: 3px;
     background: var(--teal-primary);
+    border-radius: 0 0 4px 4px;
 }
 
-/* 🎨 Cores Diárias Dinâmicas */
+/* 🎨 SECTION: Daily Colors */
 .domingo .card-header { background: var(--domingo); color: var(--domingo-dark); }
 .segunda .card-header { background: var(--segunda); color: var(--segunda-dark); }
 .terca .card-header   { background: var(--terca); color: var(--terca-dark); }
@@ -393,8 +435,10 @@ html {
 .sexta .card-header   { background: var(--sexta); color: var(--sexta-dark); }
 .sabado .card-header  { background: var(--sabado); color: var(--sabado-dark); }
 
-.card.domingo .card-header i, .card.segunda .card-header i, .card.terca .card-header i, 
-.card.quarta .card-header i, .card.quinta .card-header i, .card.sexta .card-header i, 
-.card.sabado .card-header i {
+/* Ajuste de ícones nos headers coloridos */
+.card[class*="domingo"] .card-header i, .card[class*="segunda"] .card-header i,
+.card[class*="terca"] .card-header i, .card[class*="quarta"] .card-header i,
+.card[class*="quinta"] .card-header i, .card[class*="sexta"] .card-header i,
+.card[class*="sabado"] .card-header i {
     color: rgba(0,0,0,0.4);
 }

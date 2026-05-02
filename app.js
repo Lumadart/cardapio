@@ -7,7 +7,7 @@ const SHEET_ID = '1FgvbAHH5qQHVCP1ySo5Dss_oOdkXYXOn4uRqzwvkUyQ';
 let items = {};
 let baseMeals = [];
 let weekMeals = {};
-let recipes = {}; // Armazenará as receitas agrupadas
+let recipes = {}; 
 
 const categoryIcons = {
     "Proteínas": '<i class="fa-solid fa-drumstick-bite"></i>',
@@ -44,14 +44,14 @@ async function fetchSheetData(tabName) {
 
 async function initApp() {
     const app = document.querySelector("#app");
-    app.innerHTML = "<div style='text-align:center; padding:50px; opacity:0.5'>Carregando cardápio...</div>";
+    app.innerHTML = "<div class='loading-msg'>Carregando cardápio...</div>";
 
     try {
         const [rowsConfig, rowsAlimentos, rowsAgenda, rowsReceitas] = await Promise.all([
             fetchSheetData('Configuracoes'),
             fetchSheetData('Alimentos'),
             fetchSheetData('Agenda'),
-            fetchSheetData('Receitas') // Nova aba carregada
+            fetchSheetData('Receitas')
         ]);
 
         baseMeals = rowsConfig.slice(1).map(r => {
@@ -73,7 +73,6 @@ async function initApp() {
             };
         });
 
-        // Agrupamento de Receitas
         recipes = {};
         rowsReceitas.slice(1).forEach(r => {
             if (!r.c || !r.c[0]) return;
@@ -83,7 +82,7 @@ async function initApp() {
                 recipes[nomeReceita] = {
                     ingredients: [],
                     prep: r.c[3] ? r.c[3].v : "",
-                    time: r.c[4] ? r.c[4].v : "" // Coluna E: Tempo de Preparo
+                    time: r.c[4] ? r.c[4].v : ""
                 };
             }
             
@@ -115,7 +114,7 @@ async function initApp() {
         navigate("semana");
     } catch (error) {
         console.error("Erro:", error);
-        app.innerHTML = `<div style="text-align:center; padding:50px; color:var(--segunda)">Erro ao carregar dados.</div>`;
+        app.innerHTML = `<div class="error-msg">Erro ao carregar dados.</div>`;
     }
 }
 
@@ -125,7 +124,7 @@ async function initApp() {
 
 const days = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
 const dayLabels = { domingo: "Domingo", segunda: "Segunda", terca: "Terça", quarta: "Quarta", quinta: "Quinta", sexta: "Sexta", sabado: "Sábado" };
-const EMPTY_ICON = '<i class="fa-solid fa-circle-minus" style="opacity:0.2"></i>';
+const EMPTY_ICON = '<i class="fa-solid fa-circle-question empty-style"></i>';
 
 function getToday() { return days[new Date().getDay()]; }
 function getItemData(id) { return items[id] || { name: id, qty: '---', category: "Geral" }; }
@@ -137,7 +136,20 @@ function normalize(dayMeals) {
     });
 }
 
-// 🍳 Funções do Modal
+function toggleAccordion(header) {
+    const card = header.parentElement;
+    const isCollapsed = card.classList.contains('collapsed');
+    
+    const container = card.parentElement;
+    container.querySelectorAll('.card').forEach(c => {
+        c.classList.add('collapsed');
+    });
+
+    if (isCollapsed) {
+        card.classList.remove('collapsed');
+    }
+}
+
 function openRecipe(nome) {
     const recipe = recipes[nome];
     if (!recipe) return;
@@ -152,7 +164,7 @@ function openRecipe(nome) {
 
     html += `<div class="recipe-section-title"><i class="fa-solid fa-basket-shopping"></i> Ingredientes</div>`;
     recipe.ingredients.forEach(ing => {
-        html += `<div class="row"><span><i class="fa-solid fa-check"></i> ${ing.name}</span><span>${ing.qty}</span></div>`;
+        html += `<div class="row"><span>&bull; ${ing.name}</span><span>${ing.qty}</span></div>`;
     });
 
     if (recipe.prep) {
@@ -203,10 +215,7 @@ function renderSemana(app) {
 
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "week-cards-container";
-    cardsContainer.className = "anim-up";
-    cardsContainer.style.display = "flex";
-    cardsContainer.style.flexDirection = "column";
-    cardsContainer.style.gap = "var(--block-margin)";
+    cardsContainer.className = "anim-up cards-stack";
     app.appendChild(cardsContainer);
 
     filterWeekDay(today);
@@ -231,28 +240,28 @@ function renderDayCards(container, day, meals) {
                 const icon = categoryIcons[data.category] || categoryIcons["Geral"];
                 const hasRecipe = recipes[data.name] ? 'has-recipe' : '';
                 const clickAttr = recipes[data.name] ? `onclick="openRecipe('${data.name}')"` : '';
-                const recipeIcon = recipes[data.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+                const recipeIcon = recipes[data.name] ? '<i class="fa-solid fa-book recipe-icon"></i>' : '';
                 
                 return `<div class="row">
                             <span class="${hasRecipe}" ${clickAttr}>${icon} ${data.name}${recipeIcon}</span>
                             <span>${data.qty}</span>
                         </div>`;
             }).join("")
-            : `<div class="row" style="opacity:0.3"><span>${EMPTY_ICON} Nada planejado</span><span></span></div>`;
+            : `<div class="row empty-row"><span>${EMPTY_ICON} Nada planejado</span><span></span></div>`;
 
         card.innerHTML = `
-            <div class="card-header">${mIcon} ${meal.name} - ${meal.time}</div>
-            <div class="card-content">${foodsHtml}</div>`;
+  <div class="card-header">
+        <span>${mIcon} ${meal.name}</span>
+        <span>${meal.time}</span>
+    </div>
+    <div class="card-content">${foodsHtml}</div>`;
         container.appendChild(card);
     });
 }
 
 function renderRefeicoes(app) {
     const container = document.createElement("div");
-    container.className = "anim-up";
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.gap = "var(--block-margin)";
+    container.className = "anim-up cards-stack";
     app.appendChild(container);
 
     baseMeals.forEach(meal => {
@@ -267,25 +276,27 @@ function renderRefeicoes(app) {
         });
 
         const card = document.createElement("div");
-        card.className = "card";
+        card.className = "card collapsed";
         
         let contentHtml = allowedIds.size > 0 
             ? Array.from(allowedIds).map(id => {
                 const i = getItemData(id);
-                const icon = categoryIcons[i.category] || categoryIcons["Geral"];
                 const hasRecipe = recipes[i.name] ? 'has-recipe' : '';
                 const clickAttr = recipes[i.name] ? `onclick="openRecipe('${i.name}')"` : '';
-                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-book recipe-icon"></i>' : '';
 
                 return `<div class="row">
-                            <span class="${hasRecipe}" ${clickAttr}>${icon} ${i.name}${recipeIcon}</span>
+                            <span class="${hasRecipe}" ${clickAttr}>${i.name}${recipeIcon}</span>
                             <span>${i.qty}</span>
                         </div>`;
             }).join("")
-            : `<div class="row" style="opacity:0.3"><span>Nenhum item vinculado</span></div>`;
+            : `<div class="row empty-row"><span>Nenhum item vinculado</span></div>`;
 
         card.innerHTML = `
-            <div class="card-header">${mIcon} ${meal.name}</div>
+            <div class="card-header" onclick="toggleAccordion(this)">
+                <span>${mIcon} ${meal.name} <small class="item-counter">(${allowedIds.size})</small></span>
+                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </div>
             <div class="card-content">${contentHtml}</div>`;
         container.appendChild(card);
     });
@@ -293,7 +304,7 @@ function renderRefeicoes(app) {
 
 function renderItens(app) {
     const container = document.createElement("div");
-    container.className = "anim-up";
+    container.className = "anim-up cards-stack";
     app.appendChild(container);
 
     const grouped = {};
@@ -304,26 +315,28 @@ function renderItens(app) {
 
     Object.keys(grouped).sort().forEach(cat => {
         const card = document.createElement("div");
-        card.className = "card";
-        card.style.marginBottom = "var(--block-margin)";
+        card.className = "card collapsed";
         const catIcon = categoryIcons[cat] || categoryIcons["Geral"];
+        const totalItems = grouped[cat].length;
         
         const contentHtml = grouped[cat]
             .sort((a,b) => a.name.localeCompare(b.name))
             .map(i => {
-                const icon = categoryIcons[i.category] || categoryIcons["Geral"];
                 const hasRecipe = recipes[i.name] ? 'has-recipe' : '';
                 const clickAttr = recipes[i.name] ? `onclick="openRecipe('${i.name}')"` : '';
-                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-utensils recipe-icon"></i>' : '';
+                const recipeIcon = recipes[i.name] ? '<i class="fa-solid fa-book recipe-icon"></i>' : '';
 
                 return `<div class="row">
-                            <span class="${hasRecipe}" ${clickAttr}>${icon} ${i.name}${recipeIcon}</span>
+                            <span class="${hasRecipe}" ${clickAttr}>${i.name}${recipeIcon}</span>
                             <span>${i.qty}</span>
                         </div>`;
             }).join("");
 
         card.innerHTML = `
-            <div class="card-header">${catIcon} ${cat}</div>
+            <div class="card-header" onclick="toggleAccordion(this)">
+                <span>${catIcon} ${cat} <small class="item-counter">(${totalItems})</small></span>
+                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </div>
             <div class="card-content">${contentHtml}</div>`;
         container.appendChild(card);
     });

@@ -167,9 +167,18 @@ function openRecipe(nome) {
         html += `<div class="row"><span>&bull; ${ing.name}</span><span>${ing.qty}</span></div>`;
     });
 
-    if (recipe.prep) {
+if (recipe.prep) {
         html += `<div class="recipe-section-title"><i class="fa-solid fa-fire-burner"></i> Modo de Preparo</div>`;
-        html += `<div class="recipe-prep-text">${recipe.prep}</div>`;
+        
+        // Esta lógica tenta separar por quebra de linha REAL ou pelos números (1., 2., etc)
+        const steps = recipe.prep
+            .replace(/(\d+\.)/g, '\n$1') // Adiciona quebra de linha antes de qualquer número seguido de ponto
+            .split('\n')                 // Separa pelas quebras
+            .filter(line => line.trim() !== ""); // Remove linhas vazias
+            
+        const stepsHtml = steps.map(line => `<div class="prep-step">${line.trim()}</div>`).join("");
+            
+        html += `<div class="recipe-prep-text">${stepsHtml}</div>`;
     }
 
     body.innerHTML = html;
@@ -250,7 +259,7 @@ function renderDayCards(container, day, meals) {
             : `<div class="row empty-row"><span>${EMPTY_ICON} Nada planejado</span><span></span></div>`;
 
         card.innerHTML = `
-  <div class="card-header">
+    <div class="card-header">
         <span>${mIcon} ${meal.name}</span>
         <span>${meal.time}</span>
     </div>
@@ -361,6 +370,7 @@ function navigate(route) {
     window.scrollTo(0, 0);
 }
 
+// Garante que os botões do rodapé funcionem
 document.querySelectorAll(".bottom-nav button").forEach(b => {
     b.addEventListener("click", () => navigate(b.dataset.route));
 });

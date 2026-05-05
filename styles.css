@@ -354,7 +354,7 @@ html {
     align-items: center;
     gap: var(--space-sm);
     background: rgba(20, 184, 166, 0.1);
-    color: var(--teal-primary);
+    color: var(--text-muted);
     padding: var(--space-sm) var(--space-lg);
     border-radius: var(--radius-sm);
     font-size: var(--font-xs);
@@ -373,11 +373,28 @@ html {
 .recipe-prep-text {
     font-size: var(--font-sm);
     color: var(--text-muted);
-    line-height: 1.6;
     background: var(--gray-5);
     padding: var(--space-lg);
     border-radius: var(--radius);
-    white-space: pre-wrap;
+    
+    /* Mantemos o flex para que as divs (.prep-step) se alinhem corretamente */
+    display: flex;
+    flex-direction: column;
+    
+    /* White-space: pre-wrap pode ser removido pois agora usamos divs individuais, 
+       mas manter não quebra nada. */
+    word-wrap: break-word;
+}
+
+.prep-step {
+    /* É aqui que a mágica acontece: o espaço entre cada parágrafo */
+    margin-bottom: 12px; 
+    line-height: 1.5; /* Um espaçamento de linha interno mais confortável para leitura */
+    display: block;
+}
+
+.prep-step:last-child {
+    margin-bottom: 0;
 }
 
 .modal-footer {

@@ -44,74 +44,111 @@ async function fetchSheetData(tabName) {
 
 async function initApp() {
     const app = document.querySelector("#app");
-    app.innerHTML = "<div class='loading-msg'>Carregando cardápio...</div>";
+
+    app.innerHTML =
+        "<div class='loading-msg'>Carregando cardápio...</div>";
 
     try {
-        const [rowsConfig, rowsAlimentos, rowsAgenda, rowsReceitas] = await Promise.all([
-            fetchSheetData('Configuracoes'),
-            fetchSheetData('Alimentos'),
-            fetchSheetData('Agenda'),
-            fetchSheetData('Receitas')
+
+        const [
+            rowsConfig,
+            rowsAlimentos,
+            rowsAgenda,
+            rowsReceitas
+        ] = await Promise.all([
+            fetchSheetData("Configuracoes"),
+            fetchSheetData("Alimentos"),
+            fetchSheetData("Agenda"),
+            fetchSheetData("Receitas")
         ]);
 
-        // ─────────────────────────────
         // Configurações
-        // ─────────────────────────────
-        baseMeals = rowsConfig.slice(1).map(r => {
-            if (!r.c || !r.c[0]) return null;
+        baseMeals = rowsConfig
+            .slice(1)
+            .map(r => {
 
-            return {
-                name: r.c[0].v,
-                time: r.c[1]
-                    ? (r.c[1].f || r.c[1].v)
-                    : "00:00"
-            };
-        }).filter(Boolean);
+                if (!r.c || !r.c[0]) return null;
 
-        // ─────────────────────────────
+                return {
+                    name: r.c[0].v,
+                    time: r.c[1]
+                        ? (r.c[1].f || r.c[1].v)
+                        : "00:00"
+                };
+
+            })
+            .filter(Boolean);
+
         // Alimentos
-        // ─────────────────────────────
         items = {};
 
-        rowsAlimentos.slice(1).forEach(r => {
-            if (!r.c || !r.c[0]) return;
+        rowsAlimentos
+            .slice(1)
+            .forEach(r => {
 
-            const id = String(r.c[0].v).trim();
+                if (!r.c || !r.c[0]) return;
 
-            items[id] = {
-                name: r.c[1] ? r.c[1].v : "Item",
-                qty: r.c[2] ? r.c[2].v : "---",
-                category: r.c[3] ? r.c[3].v : "Geral"
-            };
-        });
+                const id =
+                    String(r.c[0].v).trim();
 
-        // ─────────────────────────────
+                items[id] = {
+                    name: r.c[1]
+                        ? r.c[1].v
+                        : "Item",
+
+                    qty: r.c[2]
+                        ? r.c[2].v
+                        : "---",
+
+                    category: r.c[3]
+                        ? r.c[3].v
+                        : "Geral"
+                };
+
+            });
+
         // Receitas
-        // ─────────────────────────────
         recipes = {};
 
-        rowsReceitas.slice(1).forEach(r => {
-            if (!r.c || !r.c[0]) return;
+        rowsReceitas
+            .slice(1)
+            .forEach(r => {
 
-            const recipeName = String(r.c[0].v).trim();
+                if (!r.c || !r.c[0]) return;
 
-            if (!recipes[recipeName]) {
-                recipes[recipeName] = {
-                    ingredients: [],
-                    prep: r.c[3] ? r.c[3].v : "",
-                    time: r.c[4] ? r.c[4].v : ""
-                };
-            }
+                const recipeName =
+                    String(r.c[0].v).trim();
 
-            recipes[recipeName].ingredients.push({
-                name: r.c[1] ? r.c[1].v : "",
-                qty: r.c[2] ? r.c[2].v : ""
+                if (!recipes[recipeName]) {
+
+                    recipes[recipeName] = {
+                        ingredients: [],
+                        prep: r.c[3]
+                            ? r.c[3].v
+                            : "",
+
+                        time: r.c[4]
+                            ? r.c[4].v
+                            : ""
+                    };
+
+                }
+
+                recipes[recipeName]
+                    .ingredients
+                    .push({
+                        name: r.c[1]
+                            ? r.c[1].v
+                            : "",
+
+                        qty: r.c[2]
+                            ? r.c[2].v
+                            : ""
+                    });
+
             });
-        });
 
-        // ─────────────────────────────
         // Agenda semanal
-        // ─────────────────────────────
         weekMeals = {
             domingo: [],
             segunda: [],
@@ -122,46 +159,73 @@ async function initApp() {
             sabado: []
         };
 
-        rowsAgenda.slice(1).forEach(r => {
-            if (!r.c || !r.c[0] || !r.c[1]) return;
+        rowsAgenda
+            .slice(1)
+            .forEach(r => {
 
-            const rawDay = r.c[0].v
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
+                if (
+                    !r.c
+                    || !r.c[0]
+                    || !r.c[1]
+                ) return;
 
-            const day = rawDay === "terca"
-                ? "terca"
-                : rawDay;
+                const rawDay =
+                    r.c[0].v
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(
+                            /[\u0300-\u036f]/g,
+                            ""
+                        );
 
-            const mealName = r.c[1].v;
+                const day =
+                    rawDay === "terca"
+                        ? "terca"
+                        : rawDay;
 
-            const rawFoods = r.c[2]
-                ? String(r.c[2].v)
-                : "";
+                const mealName =
+                    r.c[1].v;
 
-            const foodIds = rawFoods
-                ? rawFoods.split(",").map(v => v.trim())
-                : [];
+                const rawFoods =
+                    r.c[2]
+                        ? String(r.c[2].v)
+                        : "";
 
-            const config = baseMeals.find(
-                meal => meal.name === mealName
-            );
+                const foodIds =
+                    rawFoods
+                        ? rawFoods
+                            .split(",")
+                            .map(v => v.trim())
+                        : [];
 
-            if (weekMeals[day]) {
-                weekMeals[day].push({
-                    name: mealName,
-                    time: config
-                        ? config.time
-                        : "00:00",
-                    foods: foodIds
-                });
-            }
-        });
+                const config =
+                    baseMeals.find(
+                        meal =>
+                            meal.name === mealName
+                    );
+
+                if (weekMeals[day]) {
+
+                    weekMeals[day].push({
+                        name: mealName,
+
+                        time: config
+                            ? config.time
+                            : "00:00",
+
+                        foods: foodIds
+                    });
+
+                }
+
+            });
 
         navigate("semana");
 
-    } catch (error) {
+    }
+
+    catch (error) {
+
         console.error(error);
 
         app.innerHTML = `
@@ -213,61 +277,88 @@ function getItemData(id) {
 
 function normalize(dayMeals) {
     return baseMeals.map(base => {
-        const found = dayMeals.find(
-            meal => meal.name === base.name
-        );
+
+        const found =
+            dayMeals.find(
+                meal =>
+                    meal.name === base.name
+            );
 
         return found || {
             name: base.name,
             time: base.time,
             foods: []
         };
+
     });
 }
 
 function toggleAccordion(header) {
-    const card = header.parentElement;
-    const isCollapsed =
-        card.classList.contains("collapsed");
 
-    const container = card.parentElement;
+    const card =
+        header.parentElement;
+
+    const isCollapsed =
+        card.classList.contains(
+            "collapsed"
+        );
+
+    const container =
+        card.parentElement;
 
     container
         .querySelectorAll(".card")
         .forEach(c =>
-            c.classList.add("collapsed")
+            c.classList.add(
+                "collapsed"
+            )
         );
 
     if (isCollapsed) {
-        card.classList.remove("collapsed");
+        card.classList.remove(
+            "collapsed"
+        );
     }
 }
 
+// ─────────────────────────────
+// 📖 Componente: Abrir Receita
+// ─────────────────────────────
+
 function openRecipe(name) {
-    const recipe = recipes[name];
+
+    const recipe =
+        recipes[name];
 
     if (!recipe) return;
 
-    document.getElementById(
-        "modal-title"
-    ).innerText = name;
+    document
+        .getElementById(
+            "modal-title"
+        )
+        .innerText = name;
 
     const body =
-        document.getElementById(
-            "modal-body"
-        );
+        document
+            .getElementById(
+                "modal-body"
+            );
 
     let html = "";
 
+    // Tempo de preparo
     if (recipe.time) {
+
         html += `
             <div class="recipe-time">
                 <i class="fa-regular fa-clock"></i>
                 ${recipe.time}
             </div>
         `;
+
     }
 
+    // Ingredientes
     html += `
         <div class="recipe-section-title">
             <i class="fa-solid fa-basket-shopping"></i>
@@ -276,29 +367,38 @@ function openRecipe(name) {
     `;
 
     recipe.ingredients.forEach(ing => {
+
         html += `
             <div class="row">
                 <span>• ${ing.name}</span>
                 <span>${ing.qty}</span>
             </div>
         `;
+
     });
 
+    // Modo de preparo
     if (recipe.prep) {
 
-        const steps = recipe.prep
-            .replace(/(\d+\.)/g, '\n$1')
-            .split('\n')
-            .filter(
-                line => line.trim() !== ""
-            );
+        const steps =
+            recipe.prep
+                .replace(
+                    /(\d+\.)/g,
+                    "\n$1"
+                )
+                .split("\n")
+                .filter(
+                    line =>
+                        line.trim() !== ""
+                );
 
-        const stepsHtml = steps
-            .map(
-                step =>
-                    `<div class="prep-step">${step.trim()}</div>`
-            )
-            .join("");
+        const stepsHtml =
+            steps
+                .map(
+                    step =>
+                        `<div class="prep-step">${step.trim()}</div>`
+                )
+                .join("");
 
         html += `
             <div class="recipe-section-title">
@@ -310,21 +410,28 @@ function openRecipe(name) {
                 ${stepsHtml}
             </div>
         `;
+
     }
 
     body.innerHTML = html;
 
     document
-        .getElementById("recipe-modal")
-        .classList.add("active");
+        .getElementById(
+            "recipe-modal"
+        )
+        .classList.add(
+            "active"
+        );
 }
 
 // ─────────────────────────────
 // 📅 RENDER SEMANA
 // ─────────────────────────────
 
-function renderSemana(app) {
+// EXATAMENTE O SEU CÓDIGO ORIGINAL
+// (mantido sem alterações)
 
+function renderSemana(app) {
     const today = getToday();
 
     const dateStr =
@@ -537,10 +644,10 @@ function renderDayCards(
 }
 
 // ─────────────────────────────
-// 🍽️ RENDER REFEIÇÕES
+// 📖 RENDER RECEITAS
 // ─────────────────────────────
 
-function renderRefeicoes(app) {
+function renderReceitas(app) {
 
     const container =
         document.createElement("div");
@@ -550,97 +657,30 @@ function renderRefeicoes(app) {
 
     app.appendChild(container);
 
-    baseMeals.forEach(meal => {
+    const grouped = {};
 
-        const mealIcon =
-            mealIcons[meal.name]
-            || mealIcons.Geral;
+    Object.values(items)
+        .forEach(item => {
 
-        const allowedIds =
-            new Set();
+            if (!recipes[item.name]) return;
 
-        Object.values(
-            weekMeals
-        ).forEach(dayMeals => {
+            if (!grouped[item.category]) {
+                grouped[item.category] = [];
+            }
 
-            dayMeals.forEach(m => {
+            grouped[item.category].push(item);
 
-                if (
-                    m.name === meal.name
-                ) {
-
-                    m.foods.forEach(
-                        id =>
-                            allowedIds.add(id)
-                    );
-                }
-            });
         });
 
-        const card =
-            document.createElement("div");
-
-        card.className =
-            "card collapsed";
-
-        const contentHtml =
-            Array.from(
-                allowedIds
-            )
-                .map(id => {
-
-                    const item =
-                        getItemData(id);
-
-                    return `
-                        <div class="row">
-                            <span
-                                ${
-                                    recipes[item.name]
-                                    ? `onclick="openRecipe('${item.name}') class="has-recipe"`
-                                    : ""
-                                }
-                            >
-                                ${item.name}
-                            </span>
-
-                            <span>
-                                ${item.qty}
-                            </span>
-                        </div>
-                    `;
-
-                })
-                .join("");
-
-        card.innerHTML = `
-            <div
-                class="card-header"
-                onclick="toggleAccordion(this)"
-            >
-                <span>
-                    ${mealIcon}
-                    ${meal.name}
-
-                    <small class="item-counter">
-                        (${allowedIds.size})
-                    </small>
-                </span>
-
-                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
-            </div>
-
-            <div class="card-content">
-                ${contentHtml}
-            </div>
-        `;
-
-        container.appendChild(card);
-    });
+    renderGroupedCards(
+        container,
+        grouped,
+        true
+    );
 }
 
 // ─────────────────────────────
-// 📖 RENDER RECEITAS
+// 🥬 RENDER ITENS
 // ─────────────────────────────
 
 function renderItens(app) {
@@ -655,48 +695,50 @@ function renderItens(app) {
 
     const grouped = {};
 
-    // Só itens com receita
     Object.values(items)
         .forEach(item => {
 
-            if (
-                !recipes[item.name]
-            ) return;
-
-            if (
-                !grouped[
-                    item.category
-                ]
-            ) {
-
-                grouped[
-                    item.category
-                ] = [];
+            if (!grouped[item.category]) {
+                grouped[item.category] = [];
             }
 
-            grouped[
-                item.category
-            ].push(item);
+            grouped[item.category].push(item);
+
         });
+
+    renderGroupedCards(
+        container,
+        grouped,
+        false
+    );
+}
+
+// ─────────────────────────────
+// 🎴 RENDER GENÉRICO
+// ─────────────────────────────
+
+function renderGroupedCards(
+    container,
+    grouped,
+    onlyRecipes
+) {
 
     Object.keys(grouped)
         .sort()
         .forEach(category => {
+
+            const categoryItems =
+                grouped[category];
+
+            const icon =
+                categoryIcons[category]
+                || categoryIcons.Geral;
 
             const card =
                 document.createElement("div");
 
             card.className =
                 "card collapsed";
-
-            const icon =
-                categoryIcons[
-                    category
-                ]
-                || categoryIcons.Geral;
-
-            const categoryItems =
-                grouped[category];
 
             const contentHtml =
                 categoryItems
@@ -706,21 +748,37 @@ function renderItens(app) {
                                 b.name
                             )
                     )
-                    .map(item => `
-                        <div class="row">
-                            <span
-                                class="has-recipe"
-                                onclick="openRecipe('${item.name}')"
-                            >
-                                ${item.name}
-                                <i class="fa-solid fa-book recipe-icon"></i>
-                            </span>
+                    .map(item => {
 
-                            <span>
-                                ${item.qty}
-                            </span>
-                        </div>
-                    `)
+                        const hasRecipe =
+                            recipes[item.name];
+
+                        return `
+                            <div class="row">
+                                <span
+                                    class="${hasRecipe ? "has-recipe" : ""}"
+                                    ${
+                                        hasRecipe
+                                        ? `onclick="openRecipe('${item.name}')"`
+                                        : ""
+                                    }
+                                >
+                                    ${item.name}
+
+                                    ${
+                                        hasRecipe
+                                        ? '<i class="fa-solid fa-book recipe-icon"></i>'
+                                        : ''
+                                    }
+                                </span>
+
+                                <span>
+                                    ${item.qty}
+                                </span>
+                            </div>
+                        `;
+
+                    })
                     .join("");
 
             card.innerHTML = `
@@ -728,6 +786,7 @@ function renderItens(app) {
                     class="card-header"
                     onclick="toggleAccordion(this)"
                 >
+
                     <span>
                         ${icon}
                         ${category}
@@ -738,14 +797,17 @@ function renderItens(app) {
                     </span>
 
                     <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+
                 </div>
 
                 <div class="card-content">
                     ${contentHtml}
                 </div>
+
             `;
 
             container.appendChild(card);
+
         });
 }
 
@@ -755,7 +817,7 @@ function renderItens(app) {
 
 const routes = {
     semana: renderSemana,
-    refeicoes: renderRefeicoes,
+    receitas: renderReceitas,
     itens: renderItens
 };
 

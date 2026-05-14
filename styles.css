@@ -253,13 +253,18 @@ html {
     gap: var(--space-sm);
 }
 
-.row span:last-child {
+.row span:last-child  {
     background: var(--gray-5);
     padding: var(--space-xxs) var(--space-sm);
     border-radius: var(--radius-sm);
     font-size: var(--font-xs);
     color: var(--text-muted);
 }
+
+.row span:last-child:empty {
+    display: none;
+}
+
 
 /* Controle de ícones nas rows */
 .row i {
